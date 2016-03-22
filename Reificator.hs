@@ -1,3 +1,5 @@
+-- https://www.schoolofhaskell.com/user/thoughtpolice/using-reflection
+
 {-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances, TypeFamilies #-}
 {-# LANGUAGE ConstraintKinds, KindSignatures, PolyKinds, TypeOperators #-}
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables #-}
