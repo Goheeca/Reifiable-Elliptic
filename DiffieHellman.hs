@@ -19,4 +19,4 @@ sharedSecret :: CurveDef Integer -> NN.Integer -> (Integer, Integer) -> (Integer
 sharedSecret curve secretKey publicKey = inElliptic curve $ publicKey +^ secretKey
 
 randomSecretKey :: CurveDef Integer -> IO NN.Integer
-randomSecretKey curve = liftM N.fromInteger $ randomRIO (0, (rank curve) - 1)
+randomSecretKey curve = liftM N.fromInteger $ randomRIO (1, (rank curve) - 1)
