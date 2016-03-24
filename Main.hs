@@ -8,7 +8,7 @@ curveInfo eC = do
   putStrLn $ "Galois Prime Field (p): " ++ (show $ prime eC)
   putStrLn $ "Curve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
   putStrLn $ "Generator (G): " ++ (show $ generator eC)
-  putStrLn $ "Rank (n): " ++ (show $ rank eC)
+  putStrLn $ "Order (n): " ++ (show $ rank eC)
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
 useCurve :: CurveDef Integer -> IO ()
