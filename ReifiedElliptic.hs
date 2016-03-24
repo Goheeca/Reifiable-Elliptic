@@ -2,6 +2,7 @@
 
 module ReifiedElliptic (
   reifiedGaloisPrimeField,
+  reifiedGaloisBinaryField,
   reifiedEllipticGroup
 ) where
 
@@ -12,10 +13,16 @@ import Math.NumberTheory.Moduli (invertMod)
 
 import qualified Algebra.Field as Field
 import qualified Algebra.Additive as AbelianGroup
+import qualified Algebra.Monoid as Monoid
 
 import NumericPrelude.Numeric
 import NumericPrelude.Base
 
+import Data.Bits
+import Data.List (replicate)
+import PowerOperation
+
+-- GF(p)
 reifiedGaloisPrimeField :: Integer -> Def Field.C Integer
 reifiedGaloisPrimeField prime =
   -- Field: (Integer mod prime, 0, +, -, *, 1, ^-1)
@@ -29,6 +36,28 @@ reifiedGaloisPrimeField prime =
     where totalize = (`mod` prime)
           totalize2 = liftA totalize
           inverse = \n -> case invertMod n prime of Just r -> r
+
+-- GF(2^n)
+reifiedGaloisBinaryField :: Integer -> Integer -> Def Field.C Integer
+reifiedGaloisBinaryField degree modulus =
+  -- Field: (P(degree - 1) mod modulus, 0, +, -, *, 1, ^-1)
+  ReifiedField
+    0
+    xor
+    (xor maxVal)
+    mult
+    1
+    inv
+    where maxVal = 2 ^ degree - 1
+          mult = mult_ degree 0
+          mult_ 0 p _ _ = p
+          mult_ n p a b =
+            let shiftA = shift a 1
+            in mult_ (n - 1)
+                     (if testBit b 0 then p `xor` a else p)
+                     (if testBit shiftA (fromInteger degree) then shiftA `xor` modulus else shiftA)
+                     (clearBit (shift b (-1)) (fromInteger degree))
+          inv a = using (ReifiedMonoid 1 mult) $ a <*>^ (fromInteger (maxVal - 1))
 
 
 reifiedEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (a,a)

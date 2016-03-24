@@ -1,7 +1,8 @@
 {-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances #-}
 {-# LANGUAGE TypeFamilies, FlexibleInstances #-}
 module ReifiedAlgebra (
-  Def(ReifiedAbelianGroup,
+  Def(ReifiedMonoid,
+      ReifiedAbelianGroup,
       ReifiedRing,
       ReifiedField),
   using
@@ -10,11 +11,23 @@ module ReifiedAlgebra (
 import Data.Reflection
 import Data.Constraint
 
+import qualified Algebra.Monoid as M
 import qualified Algebra.Additive as AG
 import qualified Algebra.Ring as R
 import qualified Algebra.Field as F
 
 import Reificator
+
+-- Monoid
+instance ReifiableConstraint M.C where
+  data Def M.C a = ReifiedMonoid {
+    zero_m :: a,
+    plus_m :: a -> a -> a }
+  reifiedIns = Sub Dict
+
+instance Reifies s (Def M.C a) => M.C (Lift M.C a s) where
+  idt = a where a = Lift $ zero_m (reflect a)
+  a <*> b = Lift $ plus_m (reflect a) (lower a) (lower b)
 
 -- AbelianGroup
 instance ReifiableConstraint AG.C where
@@ -29,6 +42,10 @@ instance Reifies s (Def AG.C a) => AG.C (Lift AG.C a s) where
   a + b = Lift $ plus_ag (reflect a) (lower a) (lower b)
   negate a = Lift $ negate_ag (reflect a) (lower a)
 
+instance Reifies s (Def AG.C a) => M.C (Lift AG.C a s) where
+  idt = a where a = Lift $ zero_ag (reflect a)
+  a <*> b = Lift $ plus_ag (reflect a) (lower a) (lower b)
+OA
 -- Ring
 instance ReifiableConstraint R.C where
   data Def R.C a = ReifiedRing {
@@ -47,6 +64,10 @@ instance Reifies s (Def R.C a) => AG.C (Lift R.C a s) where
   zero = a where a = Lift $ zero_r (reflect a)
   a + b = Lift $ plus_r (reflect a) (lower a) (lower b)
   negate a = Lift $ negate_r (reflect a) (lower a)
+
+instance Reifies s (Def R.C a) => M.C (Lift R.C a s) where
+  idt = a where a = Lift $ zero_r (reflect a)
+  a <*> b = Lift $ plus_r (reflect a) (lower a) (lower b)
 
 -- Field
 instance ReifiableConstraint F.C where
@@ -70,3 +91,7 @@ instance Reifies s (Def F.C a) => AG.C (Lift F.C a s) where
   zero = a where a = Lift $ zero_f (reflect a)
   a + b = Lift $ plus_f (reflect a) (lower a) (lower b)
   negate a = Lift $ negate_f (reflect a) (lower a)
+
+instance Reifies s (Def F.C a) => M.C (Lift F.C a s) where
+  idt = a where a = Lift $ zero_f (reflect a)
+  a <*> b = Lift $ plus_f (reflect a) (lower a) (lower b)
