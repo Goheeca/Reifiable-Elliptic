@@ -3,8 +3,9 @@
 module ReifiedElliptic (
   reifiedGaloisPrimeField,
   reifiedGaloisBinaryField,
-  reifiedEllipticGroup,
-  reifiedKoblitzGroup
+  reifiedStandardEllipticGroup,
+  reifiedKoblitzEllipticGroup,
+  EllipticPoint
 ) where
 
 import ReifiedAlgebra
@@ -24,6 +25,8 @@ import Data.Maybe
 import Data.Bits
 import Data.List (replicate)
 import ScalarMultiplication
+
+type EllipticPoint a = Maybe (a,a)
 
 -- GF(p)
 reifiedGaloisPrimeField :: Integer -> Def Field.C Integer
@@ -63,8 +66,8 @@ reifiedGaloisBinaryField degree modulus =
           inv a = using (ReifiedMonoid 1 mult) $ a <*>* (fromInteger (maxVal - 1))
 
 
-reifiedEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
-reifiedEllipticGroup field linearCoeff =
+reifiedStandardEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (EllipticPoint a)
+reifiedStandardEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
     -- the neutral element of addition
@@ -92,8 +95,8 @@ reifiedEllipticGroup field linearCoeff =
     where inField = using field
           fieldZero = inField zero
 
-reifiedKoblitzGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
-reifiedKoblitzGroup field linearCoeff =
+reifiedKoblitzEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (EllipticPoint a)
+reifiedKoblitzEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
     -- the neutral element of addition

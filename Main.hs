@@ -1,17 +1,19 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Main where
 
 import Elliptic
 import DiffieHellman
 
-curveInfo :: Show a => CurveDef a -> IO ()
+curveInfo :: (EllipticCurve a b, Show b) => a b -> IO ()
 curveInfo eC = do
-  putStrLn $ "Galois Prime Field (p): " ++ (show $ prime eC)
-  putStrLn $ "Curve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
+--  putStrLn $ "Galois Prime Field (p): " ++ (show $ prime_s eC)
+--  putStrLn $ "Curve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
   putStrLn $ "Generator (G): " ++ (show $ generator eC)
   putStrLn $ "Order (n): " ++ (show $ rank eC)
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
-useCurve :: CurveDef Integer -> IO ()
+useCurve :: EllipticCurve a Integer => a Integer -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
   bobSecret <- randomSecretKey eC
@@ -33,13 +35,13 @@ useCurve eC = do
   putStrLn $ "Alice: " ++ (show aliceSharedSecret)
   putStrLn $ "Bob: " ++ (show aliceSharedSecret)
 
-curveTest = CurveDef 23 1 1 (13, 16) 7 4
+curveTest = StandardCurveDef 23 1 1 (13, 16) 7 4
 
 gp192 = 6277101735386680763835789423207666416083908700390324961279
 gp521 = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
 
 curveP192 =
-  CurveDef
+  StandardCurveDef
     gp192
     (-3)
     0x64210519e59c80e70fa7e9ab72243049feb8deecc146b9b1
@@ -48,7 +50,7 @@ curveP192 =
     1
 
 curveP521 =
-  CurveDef
+  StandardCurveDef
     gp521
     (-3)
     0x051953eb9618e1c9a1f929a21a0b68540eea2da725b99b315f3b8b489918ef109e156193951ec7e937b1652c0bd3bb1bf073573df883d2c34f1ef451fd46b503f00
@@ -56,5 +58,15 @@ curveP521 =
     6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
     1
 
+curveK571 =
+  KoblitzCurveDef
+    571
+    (2^571+2^10+2^5+2^2+2^0)
+    0
+    1
+    (0x26eb7a859923fbc82189631f8103fe4ac9ca2970012d5d46024804801841ca44370958493b205e647da304db4ceb08cbbd1ba39494776fb988b47174dca88c7e2945283a01c8972, 0x349dc807f4fbf374f4aeade3bca95314dd58cec9f307a54ffc61efc006d8a2c9d4979c0ac44aea74fbebbb9f772aedcb620b01a7ba7af1b320430c8591984f601cd4c143ef1c7a3)
+    1932268761508629172347675945465993672149463664853217499328617625725759571144780212268133978522706711834706712800825351461273674974066617311929682421617092503555733685276673
+    4
+
 main :: IO ()
-main = useCurve curveP521
+main = useCurve curveK571
