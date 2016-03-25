@@ -35,7 +35,7 @@ reifiedGaloisPrimeField prime =
 
 reifiedEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
 reifiedEllipticGroup field linearCoeff =
-  -- AbelianGroup: (a, 0, +, -)
+  -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
     -- the neutral element of addition
     Nothing
