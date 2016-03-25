@@ -1,5 +1,6 @@
 {-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances #-}
 {-# LANGUAGE TypeFamilies, FlexibleInstances #-}
+
 module ReifiedAlgebra (
   Def(ReifiedMonoid,
       ReifiedAbelianGroup,
@@ -45,7 +46,7 @@ instance Reifies s (Def AG.C a) => AG.C (Lift AG.C a s) where
 instance Reifies s (Def AG.C a) => M.C (Lift AG.C a s) where
   idt = a where a = Lift $ zero_ag (reflect a)
   a <*> b = Lift $ plus_ag (reflect a) (lower a) (lower b)
-OA
+
 -- Ring
 instance ReifiableConstraint R.C where
   data Def R.C a = ReifiedRing {

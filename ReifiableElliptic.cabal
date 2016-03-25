@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                ReifiableElliptic
-version:             0.1.0.0
+version:             0.1.1.1
 synopsis:            Shows applied elliptic curves for the Diffie-Hellman key exchange
 -- description:         
 license:             PublicDomain
