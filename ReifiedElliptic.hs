@@ -3,7 +3,8 @@
 module ReifiedElliptic (
   reifiedGaloisPrimeField,
   reifiedGaloisBinaryField,
-  reifiedEllipticGroup
+  reifiedEllipticGroup,
+  reifiedKoblitzGroup
 ) where
 
 import ReifiedAlgebra
@@ -64,7 +65,7 @@ reifiedGaloisBinaryField degree modulus =
 
 reifiedEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
 reifiedEllipticGroup field linearCoeff =
-  -- AbelianGroup: (a, 0, +, -)
+  -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
     -- the neutral element of addition
     Nothing
@@ -88,5 +89,34 @@ reifiedEllipticGroup field linearCoeff =
     (\p -> case p of
        Nothing -> Nothing
        Just (x, y) -> Just (x, inField $ negate y))
+    where inField = using field
+          fieldZero = inField zero
+
+reifiedKoblitzGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
+reifiedKoblitzGroup field linearCoeff =
+  -- AbelianGroup: (a * a + Zero, 0, +, -)
+  ReifiedAbelianGroup
+    -- the neutral element of addition
+    Nothing
+    -- the add operation
+    (\p' q' -> case (p', q') of
+       (Nothing, q) -> q
+       (p, Nothing) -> p
+       (Just (x_p, y_p), Just (x_q, y_q)) ->
+         if x_p == x_q
+         then if inField (y_p + y_q) == x_q
+              then Nothing
+              else let slope = inField $ x_q + y_q / x_q
+                       x_r = inField $ slope ^ 2 + slope + linearCoeff
+                       y_r = inField $ x_q ^ 2 + (slope + one) * x_r
+                   in Just (x_r, y_r)
+         else let slope = inField $ (y_p + y_q) / (x_p + x_q)
+                  x_r = inField $ slope ^ 2 + slope + x_p + x_q + linearCoeff
+                  y_r = inField $ (x_q + x_r) * slope + x_r + y_q
+              in Just (x_r, y_r))
+    -- the additive inverse operation
+    (\p -> case p of
+       Nothing -> Nothing
+       Just (x, y) -> Just (x, inField $ x + y))
     where inField = using field
           fieldZero = inField zero
