@@ -23,8 +23,7 @@ import NumericPrelude.Base
 import Data.Maybe
 
 import Data.Bits
-import Data.List (replicate)
-import ScalarMultiplication
+import BinaryPolynomialOperations
 
 type EllipticPoint a = Maybe (a,a)
 
@@ -51,19 +50,10 @@ reifiedGaloisBinaryField degree modulus =
     0
     xor
     (xor maxVal)
-    mult
+    (polMult modulus)
     1
-    inv
+    (polInv modulus)
     where maxVal = 2 ^ degree - 1
-          mult = mult_ degree 0
-          mult_ 0 p _ _ = p
-          mult_ n p a b =
-            let shiftA = shift a 1
-            in mult_ (n - 1)
-                     (if testBit b 0 then p `xor` a else p)
-                     (if testBit shiftA (fromInteger degree) then shiftA `xor` modulus else shiftA)
-                     (clearBit (shift b (-1)) (fromInteger degree))
-          inv a = using (ReifiedMonoid 1 mult) $ a <*>* (fromInteger (maxVal - 1))
 
 
 reifiedStandardEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (EllipticPoint a)
