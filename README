@@ -1,1 +1,11 @@
 Author: Goheeca
+
+Getting started:
+Download & install Haskell Platform:
+https://www.haskell.org/platform/
+
+Installation:
+cabal install -j -O2
+
+Documentation:
+cabal haddock --executables --haddock-options="-q relative"

@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
+-- | A fast scalar multiplication of group elements.
 module ScalarMultiplication (
   (+*)
 ) where
@@ -10,7 +11,13 @@ import NumericPrelude.Base
 import qualified Algebra.Additive as AbelianGroup
 import qualified Number.NonNegative as NN
 
-(+*) :: AbelianGroup.C a => a -> NN.Integer -> a
+
+-- | This is a scalar multiplication which allows us to write
+-- @ g + g + g @ as @ g +* 3 @.
+(+*) :: AbelianGroup.C a
+        => a             -- ^ The group element being acted upon
+        -> NN.Integer    -- ^ The count of operands
+        -> a             -- ^ The result of summing
 (+*) elem power
   | power == 0 = zero
   | power == 1 = elem

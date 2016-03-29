@@ -1,3 +1,27 @@
+{- | The following simple example incorporates curve defined in <http://crypto-world.info/klima/2002/chip-2002-09-134-136.pdf this article> (czech only).
+
+The example itself:
+
+>>> useCurve curveTest
+Galois Prime Field (p): 23
+Curve (a, b): y^2 = x^3 + 1*x + 1
+Generator (G): (13,16)
+Order (n): 7
+Cofactor (h): 4
+<BLANKLINE>
+Alice
+SECRET: 3
+PUBLIC: Just (17,20)
+<BLANKLINE>
+Bob
+SECRET: 4
+PUBLIC: Just (17,3)
+<BLANKLINE>
+SHARED
+Alice: Just (5,4)
+Bob: Just (5,4)
+-}
+
 module Main where
 
 import Elliptic
