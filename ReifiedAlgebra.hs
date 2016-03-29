@@ -54,7 +54,6 @@ import Reificator
 
 -- AbelianGroup
 instance ReifiableConstraint AG.C where
-  -- | Blah
   data Def AG.C a = ReifiedAbelianGroup {
     zero_ag :: a,
     plus_ag :: a -> a -> a,

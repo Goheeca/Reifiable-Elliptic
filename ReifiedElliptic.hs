@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
 
+-- | Making of an underlying finite field for the elliptic curve and the group of the curve itself.
 module ReifiedElliptic (
   reifiedGaloisPrimeField,
   reifiedEllipticGroup
@@ -18,7 +19,9 @@ import NumericPrelude.Base
 
 import Data.Maybe
 
-reifiedGaloisPrimeField :: Integer -> Def Field.C Integer
+-- | The underlying field maker.
+reifiedGaloisPrimeField :: Integer             -- ^ A prime number, the count of elements in the field
+                        -> Def Field.C Integer -- ^ A finite field
 reifiedGaloisPrimeField prime =
   -- Field: (Integer mod prime, 0, +, -, *, 1, ^-1)
   ReifiedField
@@ -32,8 +35,11 @@ reifiedGaloisPrimeField prime =
           totalize2 = liftA totalize
           inverse = \n -> case invertMod n prime of Just r -> r
 
-
-reifiedEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (Maybe (a,a))
+-- | The maker of a group of the elliptic curve.
+reifiedEllipticGroup :: Eq a
+                     => Def Field.C a                    -- ^ An underlying field
+                     -> a                                -- ^ The linear coefficient in the equation of the particular elliptic curve
+                     -> Def AbelianGroup.C (Maybe (a,a)) -- ^ An elliptic group
 reifiedEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
