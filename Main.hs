@@ -21,12 +21,12 @@ SHARED
 Alice: Just (5,4)
 Bob: Just (5,4)
 -}
-
 module Main where
 
 import Elliptic
 import DiffieHellman
 
+-- | Prints info about the curve
 curveInfo :: Show a => CurveDef a -> IO ()
 curveInfo eC = do
   putStrLn $ "Galois Prime Field (p): " ++ (show $ prime eC)
@@ -35,6 +35,7 @@ curveInfo eC = do
   putStrLn $ "Order (n): " ++ (show $ rank eC)
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
+-- | Does an Diffie-Hellman exchange with the elliptic curve
 useCurve :: CurveDef Integer -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
@@ -57,11 +58,13 @@ useCurve eC = do
   putStrLn $ "Alice: " ++ (show aliceSharedSecret)
   putStrLn $ "Bob: " ++ (show aliceSharedSecret)
 
+-- | The example of a small curve from the aforementioned hyperlink.
 curveTest = CurveDef 23 1 1 (13, 16) 7 4
 
 gp192 = 6277101735386680763835789423207666416083908700390324961279
 gp521 = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
 
+-- | The standard NIST curve P-192
 curveP192 =
   CurveDef
     gp192
@@ -71,6 +74,7 @@ curveP192 =
     6277101735386680763835789423176059013767194773182842284081
     1
 
+-- | The standard NIST curve P-521
 curveP521 =
   CurveDef
     gp521
@@ -80,5 +84,6 @@ curveP521 =
     6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
     1
 
+-- | Runs the example with P-521
 main :: IO ()
 main = useCurve curveP521

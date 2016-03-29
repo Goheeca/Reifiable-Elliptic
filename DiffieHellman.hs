@@ -1,3 +1,4 @@
+-- | A collection of functions used in the Diffie-Hellman protocol.
 module DiffieHellman (
   publicKey,
   sharedSecret,
@@ -13,11 +14,20 @@ import Data.Maybe
 import qualified NumericPrelude.Numeric as N (fromInteger)
 import qualified Number.NonNegative as NN
 
-publicKey :: CurveDef Integer -> NN.Integer -> Maybe (Integer, Integer)
+-- | A computation of public key
+publicKey :: CurveDef Integer         -- ^ a curve definition
+          -> NN.Integer               -- ^ a private key
+          -> Maybe (Integer, Integer) -- ^ a public key
 publicKey curve secretKey = inElliptic curve $ Just (generator curve) +* secretKey
 
-sharedSecret :: CurveDef Integer -> NN.Integer -> Maybe (Integer, Integer) -> Maybe (Integer, Integer)
+-- | A computation of shared secret
+sharedSecret :: CurveDef Integer         -- ^ a curve definition
+             -> NN.Integer               -- ^ a private key
+             -> Maybe (Integer, Integer) -- ^ a public key of the other side
+             -> Maybe (Integer, Integer) -- ^ a shared secret
 sharedSecret curve secretKey publicKey = inElliptic curve $ publicKey +* secretKey
 
-randomSecretKey :: CurveDef Integer -> IO NN.Integer
+-- | A random generator of private keys in the range suitable for the given curve
+randomSecretKey :: CurveDef Integer -- ^ a curve definition
+                -> IO NN.Integer    -- ^ a random private key
 randomSecretKey curve = liftM N.fromInteger $ randomRIO (1, (rank curve) - 1)

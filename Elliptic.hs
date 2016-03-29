@@ -1,5 +1,6 @@
 {-# LANGUAGE Rank2Types, FlexibleContexts #-}
 
+-- | An encapsulation of the computations in the reified algebraic structures.
 module Elliptic (
   CurveDef(..),
   inElliptic
