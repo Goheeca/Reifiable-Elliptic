@@ -58,10 +58,12 @@ useCurve eC = do
   putStrLn $ "Alice: " ++ (show aliceSharedSecret)
   putStrLn $ "Bob: " ++ (show aliceSharedSecret)
 
--- | The example of a small curve from the aforementioned hyperlink.
+-- | The example of a small curve from the aforementioned hyperlink
 curveTest = CurveDef 23 1 1 (13, 16) 7 4
 
+-- | The prime number for P-192 curve
 gp192 = 6277101735386680763835789423207666416083908700390324961279
+-- | The prime number for P-521 curve
 gp521 = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
 
 -- | The standard NIST curve P-192
