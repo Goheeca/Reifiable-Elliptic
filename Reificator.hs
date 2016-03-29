@@ -1,9 +1,9 @@
--- https://www.schoolofhaskell.com/user/thoughtpolice/using-reflection
-
 {-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances, TypeFamilies #-}
 {-# LANGUAGE ConstraintKinds, KindSignatures, PolyKinds, TypeOperators #-}
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables #-}
 {-# LANGUAGE FunctionalDependencies #-}
+
+-- | Taken from an <https://www.schoolofhaskell.com/user/thoughtpolice/using-reflection article> about reflection in Haskell
 module Reificator where
 
 import Data.Proxy

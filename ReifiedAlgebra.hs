@@ -1,9 +1,45 @@
 {-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances #-}
 {-# LANGUAGE TypeFamilies, FlexibleInstances #-}
+
+-- | Builders of algebraic structures, they build the structure from given operations and significant elements.
 module ReifiedAlgebra (
+  -- * Builders
+  {-| They create 'Def'. Defined constructors:
+
+    * 'Def.ReifiedAbelianGroup'
+    Takes:
+
+           1. 'Def.ReifiedAbelianGroup.zero_ag' the neutral element of addition.
+           2. 'Def.ReifiedAbelianGroup.plus_ag' the addition operation.
+           3. 'Def.ReifiedAbelianGroup.negate_ag' the addition inverse operation.
+
+
+    * 'Def.ReifiedRing'
+    Takes:
+
+           1. 'Def.ReifiedRing.zero_r' the neutral element of addition.
+           2. 'Def.ReifiedRing.plus_r' the addition operation.
+           3. 'Def.ReifiedRing.negate_r' the addition inverse operation.
+           4. 'Def.ReifiedRing.multiply_r' the multiplicative operation.
+           5. 'Def.ReifiedRing.one_r' the neutral element of multiplication.
+
+
+    * 'Def.ReifiedField'
+    Takes:
+
+           1. 'Def.ReifiedField.zero_f' the neutral element of addition.
+           2. 'Def.ReifiedField.plus_f' the addition operation.
+           3. 'Def.ReifiedField.negate_f' the addition inverse operation.
+           4. 'Def.ReifiedField.multiply_f' the multiplicative operation.
+           5. 'Def.ReifiedField.one_f' the neutral element of multiplication.
+           6. 'Def.ReifiedField.inverse_f' the multiplicative inverse operation.
+
+  -}
   Def(ReifiedAbelianGroup,
       ReifiedRing,
       ReifiedField),
+  -- * Using
+  -- | Takes a builded algebraic structure and applies it in a computation of the second argument.
   using
 ) where
 
@@ -18,6 +54,7 @@ import Reificator
 
 -- AbelianGroup
 instance ReifiableConstraint AG.C where
+  -- | Blah
   data Def AG.C a = ReifiedAbelianGroup {
     zero_ag :: a,
     plus_ag :: a -> a -> a,
