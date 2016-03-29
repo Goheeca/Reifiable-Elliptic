@@ -36,7 +36,7 @@ with d v = reify d (lower . asProxyOf v)
 --------------------------------------------------------------------------------
 -- Kicking it up to over 9000
 
--- | Evaluates an expression in a reifiable constriant
+-- | Evaluates an expression in a reifiable constraint
 using :: forall p a. ReifiableConstraint p
       => Def p a                           -- ^ a context constraint builder
       -> (p a => a)                        -- ^ an expression in a given context
