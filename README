@@ -1,5 +1,7 @@
 Author: Goheeca
 
+Cabal:
+
 Getting started:
 Download & install Haskell Platform:
 https://www.haskell.org/platform/
@@ -7,5 +9,20 @@ https://www.haskell.org/platform/
 Installation:
 cabal install -j -O2
 
+Run:
+cabal run
+
 Documentation:
 cabal haddock --executables --haddock-options="-q relative"
+
+Stack:
+
+Getting started:
+Download & Install Stack:
+https://haskellstack.org/
+
+Build:
+stack build
+
+Run:
+stack exec ReifiableElliptic
