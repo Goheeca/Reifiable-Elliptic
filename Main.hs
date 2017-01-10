@@ -56,7 +56,7 @@ useCurve eC = do
   putStrLn ""
   putStrLn $ "SHARED"
   putStrLn $ "Alice: " ++ (show aliceSharedSecret)
-  putStrLn $ "Bob: " ++ (show aliceSharedSecret)
+  putStrLn $ "Bob: " ++ (show bobSharedSecret)
 
 -- | The example of a small curve from the aforementioned hyperlink
 curveTest = CurveDef 23 1 1 (13, 16) 7 4
