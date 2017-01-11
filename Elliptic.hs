@@ -1,5 +1,6 @@
 {-# LANGUAGE Rank2Types, FlexibleContexts, MultiParamTypeClasses #-}
 
+-- | An encapsulation of the computations in the reified algebraic structures.
 module Elliptic (
   StandardCurveDef(..),
   KoblitzCurveDef(..),
@@ -13,6 +14,7 @@ import qualified Algebra.Additive as AbelianGroup
 
 import Reificator (using)
 
+-- | A definition of the elliptic curve
 data StandardCurveDef a =
   StandardCurveDef {
     prime_s :: a,
@@ -23,6 +25,7 @@ data StandardCurveDef a =
     cofactor_s :: a
   } deriving (Show, Eq)
 
+-- | A definition of the elliptic curve
 data KoblitzCurveDef a =
   KoblitzCurveDef {
     degree_k :: a,
@@ -35,6 +38,7 @@ data KoblitzCurveDef a =
   } deriving (Show, Eq)
 
 class EllipticCurve a b where
+  -- | For computations in an elliptic group
   inElliptic :: a b
               -> ((AbelianGroup.C (EllipticPoint b))
                   => EllipticPoint b)

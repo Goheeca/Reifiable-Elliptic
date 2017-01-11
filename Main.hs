@@ -1,10 +1,34 @@
 {-# LANGUAGE FlexibleContexts #-}
 
+{- | The following simple example incorporates curve defined in <http://crypto-world.info/klima/2002/chip-2002-09-134-136.pdf this article> (czech only).
+
+The example itself:
+
+>>> useCurve curveTest
+Galois Prime Field (p): 23
+Curve (a, b): y^2 = x^3 + 1*x + 1
+Generator (G): (13,16)
+Order (n): 7
+Cofactor (h): 4
+<BLANKLINE>
+Alice
+SECRET: 3
+PUBLIC: Just (17,20)
+<BLANKLINE>
+Bob
+SECRET: 4
+PUBLIC: Just (17,3)
+<BLANKLINE>
+SHARED
+Alice: Just (5,4)
+Bob: Just (5,4)
+-}
 module Main where
 
 import Elliptic
 import DiffieHellman
 
+-- | Prints info about the curve
 curveInfo :: (EllipticCurve a b, Show b) => a b -> IO ()
 curveInfo eC = do
 --  putStrLn $ "Galois Prime Field (p): " ++ (show $ prime_s eC)
@@ -13,6 +37,7 @@ curveInfo eC = do
   putStrLn $ "Order (n): " ++ (show $ rank eC)
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
+-- | Does an Diffie-Hellman exchange with the elliptic curve
 useCurve :: EllipticCurve a Integer => a Integer -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
@@ -33,13 +58,17 @@ useCurve eC = do
   putStrLn ""
   putStrLn $ "SHARED"
   putStrLn $ "Alice: " ++ (show aliceSharedSecret)
-  putStrLn $ "Bob: " ++ (show aliceSharedSecret)
+  putStrLn $ "Bob: " ++ (show bobSharedSecret)
 
+-- | The example of a small curve from the aforementioned hyperlink
 curveTest = StandardCurveDef 23 1 1 (13, 16) 7 4
 
+-- | The prime number for P-192 curve
 gp192 = 6277101735386680763835789423207666416083908700390324961279
+-- | The prime number for P-521 curve
 gp521 = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
 
+-- | The standard NIST curve P-192
 curveP192 =
   StandardCurveDef
     gp192
@@ -49,6 +78,7 @@ curveP192 =
     6277101735386680763835789423176059013767194773182842284081
     1
 
+-- | The standard NIST curve P-521
 curveP521 =
   StandardCurveDef
     gp521
@@ -68,5 +98,6 @@ curveK571 =
     1932268761508629172347675945465993672149463664853217499328617625725759571144780212268133978522706711834706712800825351461273674974066617311929682421617092503555733685276673
     4
 
+-- | Runs the example with P-521
 main :: IO ()
 main = useCurve curveK571

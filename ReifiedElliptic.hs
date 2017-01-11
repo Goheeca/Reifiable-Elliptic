@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
 
+-- | Making of an underlying finite field for the elliptic curve and the group of the curve itself.
 module ReifiedElliptic (
   reifiedGaloisPrimeField,
   reifiedGaloisBinaryField,
@@ -27,8 +28,9 @@ import BinaryPolynomialOperations
 
 type EllipticPoint a = Maybe (a,a)
 
--- GF(p)
-reifiedGaloisPrimeField :: Integer -> Def Field.C Integer
+-- | The underlying field maker.
+reifiedGaloisPrimeField :: Integer             -- ^ A prime number, the count of elements in the field
+                        -> Def Field.C Integer -- ^ A finite field
 reifiedGaloisPrimeField prime =
   -- Field: (Integer mod prime, 0, +, -, *, 1, ^-1)
   ReifiedField
@@ -56,7 +58,11 @@ reifiedGaloisBinaryField degree modulus =
     where maxVal = 2 ^ degree - 1
 
 
-reifiedStandardEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (EllipticPoint a)
+-- | The maker of a group of the elliptic curve.
+reifiedStandardEllipticGroup :: Eq a
+                             => Def Field.C a                    -- ^ An underlying field
+                             -> a                                -- ^ The linear coefficient in the equation of the particular elliptic curve
+                             -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
 reifiedStandardEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
