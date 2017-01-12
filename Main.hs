@@ -27,6 +27,7 @@ module Main where
 
 import Elliptic
 import DiffieHellman
+import Data.BitVector (BV)
 
 -- | Prints info about the curve
 curveInfo :: (EllipticCurve a b, Show b) => a b -> IO ()
@@ -38,10 +39,10 @@ curveInfo eC = do
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
 -- | Does an Diffie-Hellman exchange with the elliptic curve
-useCurve :: EllipticCurve a Integer => a Integer -> IO ()
+useCurve :: (EllipticCurve a b, Show b) => a b -> IO ()
 useCurve eC = do
-  aliceSecret <- randomSecretKey eC
-  bobSecret <- randomSecretKey eC
+  aliceSecret <- return 5 --randomSecretKey eC
+  bobSecret <- return 7 --randomSecretKey eC
   alicePublic <- return $ publicKey eC aliceSecret
   bobPublic <- return $ publicKey eC bobSecret
   aliceSharedSecret <- return $ sharedSecret eC aliceSecret bobPublic
@@ -88,6 +89,7 @@ curveP521 =
     6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
     1
 
+curveK571 :: KoblitzCurveDef Integer
 curveK571 =
   KoblitzCurveDef
     571

@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types, FlexibleContexts, MultiParamTypeClasses #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts, MultiParamTypeClasses, FunctionalDependencies #-}
 
 -- | An encapsulation of the computations in the reified algebraic structures.
 module Elliptic (
@@ -11,6 +11,7 @@ module Elliptic (
 import ReifiedElliptic
 
 import qualified Algebra.Additive as AbelianGroup
+import Data.BitVector
 
 import Reificator (using)
 
@@ -37,35 +38,40 @@ data KoblitzCurveDef a =
     cofactor_k :: a
   } deriving (Show, Eq)
 
-class EllipticCurve a b where
+class EllipticCurve a b | a -> b where
   -- | For computations in an elliptic group
-  inElliptic :: a b
+  inElliptic :: a c
               -> ((AbelianGroup.C (EllipticPoint b))
                   => EllipticPoint b)
               -> EllipticPoint b
-  aCoeff :: a b -> b
-  bCoeff :: a b -> b
-  generator :: a b -> (b, b)
-  rank :: a b -> b
-  cofactor :: a b -> b
+  aCoeff :: a c -> b
+  bCoeff :: a c -> b
+  generator :: a c -> (b, b)
+  rank :: a c -> b
+  cofactor :: a c -> b
 
 instance EllipticCurve StandardCurveDef Integer where
-  aCoeff = aCoeff_s
-  bCoeff = bCoeff_s
-  generator = generator_s
-  rank = rank_s
-  cofactor = cofactor_s
+  aCoeff = fromInteger . aCoeff_s
+  bCoeff = fromInteger . bCoeff_s
+  generator = fromInteger . generator_s
+  rank = fromInteger . rank_s
+  cofactor = fromInteger . cofactor_s
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
                             (reifiedGaloisPrimeField $ prime_s curve)
                             $ aCoeff curve
 
-instance EllipticCurve KoblitzCurveDef Integer where
-  aCoeff = aCoeff_k
-  bCoeff = bCoeff_k
-  generator = generator_k
-  rank = rank_k
-  cofactor = cofactor_k
+toBV :: Integral a => (KoblitzCurveDef a -> a) -> KoblitzCurveDef a -> BV
+toBV fval def = bitVec ((size $ fromIntegral $ modulus_k def) - 1) $ fval def
+
+instance EllipticCurve KoblitzCurveDef BV where
+  aCoeff = toBV aCoeff_k
+  bCoeff = toBV bCoeff_k
+  generator = \def -> (toBV x_k def, toBV y_k def)
+    where x_k = fst . generator_k
+          y_k = snd . generator_k
+  rank = toBV rank_k
+  cofactor = toBV cofactor_k
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
                             (reifiedGaloisBinaryField (degree_k curve) (modulus_k curve))

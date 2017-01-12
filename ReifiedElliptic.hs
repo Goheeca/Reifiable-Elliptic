@@ -23,7 +23,7 @@ import NumericPrelude.Base
 
 import Data.Maybe
 
-import Data.Bits
+import Data.BitVector
 import BinaryPolynomialOperations
 
 type EllipticPoint a = Maybe (a,a)
@@ -45,17 +45,16 @@ reifiedGaloisPrimeField prime =
           inverse = \n -> case invertMod n prime of Just r -> r
 
 -- GF(2^n)
-reifiedGaloisBinaryField :: Integer -> Integer -> Def Field.C Integer
-reifiedGaloisBinaryField degree modulus =
+reifiedGaloisBinaryField :: BV -> BV -> Def Field.C BV
+reifiedGaloisBinaryField _ modulus =
   -- Field: (P(degree - 1) mod modulus, 0, +, -, *, 1, ^-1)
   ReifiedField
     0
     xor
-    (xor maxVal)
+    complement
     (polMult modulus)
     1
     (polInv modulus)
-    where maxVal = 2 ^ degree - 1
 
 
 -- | The maker of a group of the elliptic curve.

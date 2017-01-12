@@ -19,6 +19,6 @@ executable ReifiableElliptic
   main-is:             Main.hs
   -- other-modules:       
   other-extensions:    NoImplicitPrelude, Rank2Types, FlexibleContexts, UndecidableInstances, TypeFamilies, FlexibleInstances, ConstraintKinds, KindSignatures, PolyKinds, TypeOperators, MultiParamTypeClasses, ScopedTypeVariables, FunctionalDependencies
-  build-depends:       base >=4.7, arithmoi >=0.4, numeric-prelude >=0.4, reflection >=2.1, constraints >=0.8, random >=1.0
+  build-depends:       base >=4.7, arithmoi >=0.4, numeric-prelude >=0.4, reflection >=2.1, constraints >=0.8, random >=1.0, bv >= 0.4
   -- hs-source-dirs:      
   default-language:    Haskell2010
