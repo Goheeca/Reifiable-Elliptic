@@ -27,7 +27,6 @@ module Main where
 
 import Elliptic
 import DiffieHellman
-import Data.BitVector (BV)
 
 -- | Prints info about the curve
 curveInfo :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()

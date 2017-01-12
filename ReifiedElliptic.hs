@@ -49,12 +49,14 @@ reifiedGaloisBinaryField :: BV -> BV -> Def Field.C BV
 reifiedGaloisBinaryField _ modulus =
   -- Field: (P(degree - 1) mod modulus, 0, +, -, *, 1, ^-1)
   ReifiedField
-    0
+    (ext 0)
     xor
-    complement
+    (complement . ext)
     (polMult modulus)
-    1
+    (ext 1)
     (polInv modulus)
+    where degree = size modulus - 1
+          ext = bitVec degree
 
 
 -- | The maker of a group of the elliptic curve.
