@@ -30,7 +30,7 @@ import DiffieHellman
 import Data.BitVector (BV)
 
 -- | Prints info about the curve
-curveInfo :: (EllipticCurve a b, Show b) => a b -> IO ()
+curveInfo :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()
 curveInfo eC = do
 --  putStrLn $ "Galois Prime Field (p): " ++ (show $ prime_s eC)
 --  putStrLn $ "Curve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
@@ -39,7 +39,7 @@ curveInfo eC = do
   putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
 -- | Does an Diffie-Hellman exchange with the elliptic curve
-useCurve :: (EllipticCurve a b, Show b) => a b -> IO ()
+useCurve :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()
 useCurve eC = do
   aliceSecret <- return 5 --randomSecretKey eC
   bobSecret <- return 7 --randomSecretKey eC

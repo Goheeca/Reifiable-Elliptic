@@ -40,25 +40,31 @@ data KoblitzCurveDef a =
 
 class EllipticCurve a b | a -> b where
   -- | For computations in an elliptic group
-  inElliptic :: a c
-              -> ((AbelianGroup.C (EllipticPoint b))
-                  => EllipticPoint b)
-              -> EllipticPoint b
-  aCoeff :: a c -> b
-  bCoeff :: a c -> b
-  generator :: a c -> (b, b)
-  rank :: a c -> b
-  cofactor :: a c -> b
+  inElliptic :: Integral c
+             => a c
+             -> ((AbelianGroup.C (EllipticPoint b))
+                 => EllipticPoint b)
+             -> EllipticPoint b
+  aCoeff :: Integral c => a c -> b
+  bCoeff :: Integral c => a c -> b
+  generator :: Integral c => a c -> (b, b)
+  rank :: Integral c => a c -> b
+  cofactor :: Integral c => a c -> b
+
+toIngr :: Integral a => (b a -> a) -> b a -> Integer
+toIngr fval def = fromIntegral $ fval def
 
 instance EllipticCurve StandardCurveDef Integer where
-  aCoeff = fromInteger . aCoeff_s
-  bCoeff = fromInteger . bCoeff_s
-  generator = fromInteger . generator_s
-  rank = fromInteger . rank_s
-  cofactor = fromInteger . cofactor_s
+  aCoeff = toIngr aCoeff_s
+  bCoeff = toIngr bCoeff_s
+  generator = \def -> (toIngr x_s def, toIngr y_s def)
+    where x_s = fst . generator_s
+          y_s = snd . generator_s
+  rank = toIngr rank_s
+  cofactor = toIngr cofactor_s
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
-                            (reifiedGaloisPrimeField $ prime_s curve)
+                            (reifiedGaloisPrimeField $ toIngr prime_s curve)
                             $ aCoeff curve
 
 toBV :: Integral a => (KoblitzCurveDef a -> a) -> KoblitzCurveDef a -> BV
@@ -74,5 +80,5 @@ instance EllipticCurve KoblitzCurveDef BV where
   cofactor = toBV cofactor_k
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
-                            (reifiedGaloisBinaryField (degree_k curve) (modulus_k curve))
+                            (reifiedGaloisBinaryField (toBV degree_k curve) (toBV modulus_k curve))
                             $ aCoeff curve
