@@ -5,7 +5,8 @@ module Elliptic (
   StandardCurveDef(..),
   KoblitzCurveDef(..),
   EllipticPoint,
-  EllipticCurve(..)
+  EllipticCurve(..),
+  _binaryField
 ) where
 
 import ReifiedElliptic
@@ -70,6 +71,9 @@ instance EllipticCurve StandardCurveDef Integer where
 toBV :: Integral a => (KoblitzCurveDef a -> a) -> KoblitzCurveDef a -> BV
 toBV fval def = bitVec ((size $ fromIntegral $ modulus_k def) - 1) $ fval def
 
+modulus_BV :: Integral a => KoblitzCurveDef a -> BV
+modulus_BV def = bitVec (size $ fromIntegral $ modulus_k def) $ modulus_k def
+
 instance EllipticCurve KoblitzCurveDef BV where
   aCoeff = toBV aCoeff_k
   bCoeff = toBV bCoeff_k
@@ -80,5 +84,7 @@ instance EllipticCurve KoblitzCurveDef BV where
   cofactor = toBV cofactor_k
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
-                            (reifiedGaloisBinaryField (toBV degree_k curve) (toBV modulus_k curve))
+                            (reifiedGaloisBinaryField (toBV degree_k curve) (modulus_BV curve))
                             $ aCoeff curve
+
+_binaryField curve = reifiedGaloisBinaryField (toBV degree_k curve) (modulus_BV curve)
