@@ -40,8 +40,8 @@ curveInfo eC = do
 -- | Does an Diffie-Hellman exchange with the elliptic curve
 useCurve :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()
 useCurve eC = do
-  aliceSecret <- return 5 --randomSecretKey eC
-  bobSecret <- return 7 --randomSecretKey eC
+  aliceSecret <- randomSecretKey eC
+  bobSecret <- randomSecretKey eC
   alicePublic <- return $ publicKey eC aliceSecret
   bobPublic <- return $ publicKey eC bobSecret
   aliceSharedSecret <- return $ sharedSecret eC aliceSecret bobPublic
@@ -99,17 +99,6 @@ curveK571 =
     1932268761508629172347675945465993672149463664853217499328617625725759571144780212268133978522706711834706712800825351461273674974066617311929682421617092503555733685276673
     4
 
-_curveKoblitzTest :: KoblitzCurveDef Integer
-_curveKoblitzTest =
-  KoblitzCurveDef
-    8
-    (2^8+2^4+2^3+2^1+2^0)
-    0
-    1
-    (0x1,0x1)
-    10
-    1
-
--- | Runs the example with P-521
+-- | Runs the example with K-571
 main :: IO ()
 main = useCurve curveK571

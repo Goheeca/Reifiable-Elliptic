@@ -26,9 +26,9 @@ import Data.Maybe
 
 import Data.Bit (F2Poly, unF2Poly)
 import qualified Data.Vector.Unboxed as Vector (length)
+import qualified Prelude ((+), fromInteger)
 import BinaryPolynomialOperations
 
-import qualified Prelude ((+), fromInteger)
 
 type EllipticPoint a = Maybe (a,a)
 

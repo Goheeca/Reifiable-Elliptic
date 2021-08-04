@@ -69,23 +69,23 @@ instance EllipticCurve StandardCurveDef Integer where
                             (reifiedGaloisPrimeField $ toIngr prime_s curve)
                             $ aCoeff curve
 
-toBV :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
-toBV fval def = fromInteger . toInteger $ fval def
+toBinPoly :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
+toBinPoly fval def = fromInteger . toInteger $ fval def
 
-modulus_BV :: Integral a => KoblitzCurveDef a -> F2Poly
-modulus_BV def = fromInteger . toInteger $ modulus_k def
+modulus_BinPoly :: Integral a => KoblitzCurveDef a -> F2Poly
+modulus_BinPoly def = fromInteger . toInteger $ modulus_k def
 
 instance EllipticCurve KoblitzCurveDef F2Poly where
-  aCoeff = toBV aCoeff_k
-  bCoeff = toBV bCoeff_k
-  generator = \def -> (toBV x_k def, toBV y_k def)
+  aCoeff = toBinPoly aCoeff_k
+  bCoeff = toBinPoly bCoeff_k
+  generator = \def -> (toBinPoly x_k def, toBinPoly y_k def)
     where x_k = fst . generator_k
           y_k = snd . generator_k
   rank = rank_k
   cofactor = cofactor_k
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
-                            (reifiedGaloisBinaryField (toBV degree_k curve) (modulus_BV curve))
+                            (reifiedGaloisBinaryField (toBinPoly degree_k curve) (modulus_BinPoly curve))
                             $ aCoeff curve
 
-_binaryField curve = reifiedGaloisBinaryField (toBV degree_k curve) (modulus_BV curve)
+_binaryField curve = reifiedGaloisBinaryField (toBinPoly degree_k curve) (modulus_BinPoly curve)
