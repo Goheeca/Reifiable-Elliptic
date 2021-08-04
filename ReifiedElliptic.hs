@@ -12,7 +12,8 @@ module ReifiedElliptic (
 import ReifiedAlgebra
 
 import Control.Applicative (liftA)
-import Math.NumberTheory.Moduli (invertMod)
+import Math.NumberTheory.Moduli (invertSomeMod, modulo, getVal, SomeMod(..))
+import GHC.Natural (naturalFromInteger)
 
 import qualified Algebra.Field as Field
 import qualified Algebra.Additive as AbelianGroup
@@ -42,7 +43,7 @@ reifiedGaloisPrimeField prime =
     inverse              -- the multiplicative inverse operation
     where totalize = (`mod` prime)
           totalize2 = liftA totalize
-          inverse = \n -> case invertMod n prime of Just r -> r
+          inverse = \n -> case invertSomeMod (n `modulo` naturalFromInteger prime) of Just (SomeMod r) -> getVal r
 
 -- GF(2^n)
 reifiedGaloisBinaryField :: BV -> BV -> Def Field.C BV
