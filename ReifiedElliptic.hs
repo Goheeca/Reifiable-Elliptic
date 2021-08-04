@@ -24,8 +24,11 @@ import NumericPrelude.Base
 
 import Data.Maybe
 
-import Data.BitVector
+import Data.Bit (F2Poly, unF2Poly)
+import qualified Data.Vector.Unboxed as Vector (length)
 import BinaryPolynomialOperations
+
+import qualified Prelude ((+), fromInteger)
 
 type EllipticPoint a = Maybe (a,a)
 
@@ -46,18 +49,18 @@ reifiedGaloisPrimeField prime =
           inverse = \n -> case invertSomeMod (n `modulo` naturalFromInteger prime) of Just (SomeMod r) -> getVal r
 
 -- GF(2^n)
-reifiedGaloisBinaryField :: BV -> BV -> Def Field.C BV
+reifiedGaloisBinaryField :: F2Poly -> F2Poly -> Def Field.C F2Poly
 reifiedGaloisBinaryField _ modulus =
   -- Field: (P(degree - 1) mod modulus, 0, +, -, *, 1, ^-1)
   ReifiedField
-    (ext 0)
-    xor
-    (complement . ext)
+    0
+    (Prelude.+)
+    (complementMask Prelude.+)
     (polMult modulus)
-    (ext 1)
+    1
     (polInv modulus)
-    where degree = size modulus - 1
-          ext = bitVec degree
+    where degree = toInteger . (subtract 1) . Vector.length $ unF2Poly modulus
+          complementMask = Prelude.fromInteger $ (2 ^ degree) - 1
 
 
 -- | The maker of a group of the elliptic curve.

@@ -12,7 +12,7 @@ module Elliptic (
 import ReifiedElliptic
 
 import qualified Algebra.Additive as AbelianGroup
-import Data.BitVector
+import Data.Bit (F2Poly)
 import qualified Number.NonNegative as NN
 
 import Reificator (using)
@@ -69,13 +69,13 @@ instance EllipticCurve StandardCurveDef Integer where
                             (reifiedGaloisPrimeField $ toIngr prime_s curve)
                             $ aCoeff curve
 
-toBV :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> BV
-toBV fval def = bitVec ((size $ fromIntegral $ modulus_k def) - 1) $ fval def
+toBV :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
+toBV fval def = fromInteger . toInteger $ fval def
 
-modulus_BV :: Integral a => KoblitzCurveDef a -> BV
-modulus_BV def = bitVec (size $ fromIntegral $ modulus_k def) $ modulus_k def
+modulus_BV :: Integral a => KoblitzCurveDef a -> F2Poly
+modulus_BV def = fromInteger . toInteger $ modulus_k def
 
-instance EllipticCurve KoblitzCurveDef BV where
+instance EllipticCurve KoblitzCurveDef F2Poly where
   aCoeff = toBV aCoeff_k
   bCoeff = toBV bCoeff_k
   generator = \def -> (toBV x_k def, toBV y_k def)
