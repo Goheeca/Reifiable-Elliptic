@@ -6,7 +6,6 @@ module Elliptic (
   KoblitzCurveDef(..),
   EllipticPoint,
   EllipticCurve(..),
-  _binaryField
 ) where
 
 import ReifiedElliptic
@@ -26,7 +25,7 @@ data StandardCurveDef a =
     generator_s :: (a, a),
     rank_s :: NN.Integer,
     cofactor_s :: NN.Integer
-  } deriving (Show, Eq)
+  }
 
 -- | A definition of the elliptic curve
 data KoblitzCurveDef a =
@@ -38,7 +37,7 @@ data KoblitzCurveDef a =
     generator_k :: (a, a),
     rank_k :: NN.Integer,
     cofactor_k :: NN.Integer
-  } deriving (Show, Eq)
+  }
 
 class EllipticCurve a b | a -> b where
   -- | For computations in an elliptic group
@@ -69,6 +68,15 @@ instance EllipticCurve StandardCurveDef Integer where
                             (reifiedGaloisPrimeField $ toIngr prime_s curve)
                             $ aCoeff curve
 
+instance (Show a, Integral a) => Show (StandardCurveDef a) where
+  show eC =
+    "Galois Prime Field (p): " ++ (show $ prime_s eC)
+    ++ "\nCurve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
+    ++ "\nGenerator (G): " ++ (show $ generator eC)
+    ++ "\nOrder (n): " ++ (show $ rank eC)
+    ++ "\nCofactor (h): " ++ (show $ cofactor eC)
+
+
 toBinPoly :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
 toBinPoly fval def = fromInteger . toInteger $ fval def
 
@@ -88,4 +96,11 @@ instance EllipticCurve KoblitzCurveDef F2Poly where
                             (reifiedGaloisBinaryField (toBinPoly degree_k curve) (modulus_BinPoly curve))
                             $ aCoeff curve
 
-_binaryField curve = reifiedGaloisBinaryField (toBinPoly degree_k curve) (modulus_BinPoly curve)
+instance (Show a, Integral a) => Show (KoblitzCurveDef a) where
+  show eC =
+    "Galois Binary Field (modulus): " ++ (show $ modulus_BinPoly eC)
+    ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ (show $ aCoeff eC) ++ "*x^2 + " ++ (show $ bCoeff eC)
+    ++ "\nGenerator (G): " ++ (show $ generator eC)
+    ++ "\nOrder (n): " ++ (show $ rank eC)
+    ++ "\nCofactor (h): " ++ (show $ cofactor eC)
+

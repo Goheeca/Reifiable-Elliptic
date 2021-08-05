@@ -65,8 +65,8 @@ reifiedGaloisBinaryField _ modulus =
 
 -- | The maker of a group of the elliptic curve.
 reifiedStandardEllipticGroup :: Eq a
-                             => Def Field.C a                    -- ^ An underlying field
-                             -> a                                -- ^ The linear coefficient in the equation of the particular elliptic curve
+                             => Def Field.C a                        -- ^ An underlying field
+                             -> a                                    -- ^ The linear coefficient in the equation of the particular elliptic curve
                              -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
 reifiedStandardEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
@@ -96,7 +96,11 @@ reifiedStandardEllipticGroup field linearCoeff =
     where inField = using field
           fieldZero = inField zero
 
-reifiedKoblitzEllipticGroup :: Eq a => Def Field.C a -> a -> Def AbelianGroup.C (EllipticPoint a)
+-- | The maker of a group of the elliptic curve.
+reifiedKoblitzEllipticGroup :: Eq a
+                            => Def Field.C a                        -- ^ An underlying field
+                            -> a                                    -- ^ The linear coefficient in the equation of the particular elliptic curve
+                            -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
 reifiedKoblitzEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
@@ -123,4 +127,3 @@ reifiedKoblitzEllipticGroup field linearCoeff =
        Nothing -> Nothing
        Just (x, y) -> Just (x, inField $ x + y))
     where inField = using field
-          fieldZero = inField zero

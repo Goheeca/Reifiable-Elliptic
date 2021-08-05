@@ -28,17 +28,9 @@ module Main where
 import Elliptic
 import DiffieHellman
 
--- | Prints info about the curve
-curveInfo :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()
-curveInfo eC = do
---  putStrLn $ "Galois Prime Field (p): " ++ (show $ prime_s eC)
---  putStrLn $ "Curve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
-  putStrLn $ "Generator (G): " ++ (show $ generator eC)
-  putStrLn $ "Order (n): " ++ (show $ rank eC)
-  putStrLn $ "Cofactor (h): " ++ (show $ cofactor eC)
 
--- | Does an Diffie-Hellman exchange with the elliptic curve
-useCurve :: (EllipticCurve a b, Show b, Integral c, Show c) => a c -> IO ()
+-- | Does a Diffie-Hellman exchange with the elliptic curve
+useCurve :: (EllipticCurve a b, Show b, Integral c, Show (a c)) => a c -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
   bobSecret <- randomSecretKey eC
@@ -46,7 +38,8 @@ useCurve eC = do
   bobPublic <- return $ publicKey eC bobSecret
   aliceSharedSecret <- return $ sharedSecret eC aliceSecret bobPublic
   bobSharedSecret <- return $ sharedSecret eC bobSecret alicePublic
-  curveInfo eC
+  --curveInfo eC
+  putStrLn $ show eC
   putStrLn ""
   putStrLn $ "Alice"
   putStrLn $ "SECRET: " ++ (show aliceSecret)
@@ -99,6 +92,10 @@ curveK571 =
     1932268761508629172347675945465993672149463664853217499328617625725759571144780212268133978522706711834706712800825351461273674974066617311929682421617092503555733685276673
     4
 
--- | Runs the example with K-571
+-- | Runs the example with P-521 and K-571
 main :: IO ()
-main = useCurve curveK571
+main = do
+  putStrLn "Curve P-521" >> putStrLn ""
+  useCurve curveP521
+  putStrLn "" >> putStrLn "Curve K-571" >> putStrLn ""
+  useCurve curveK571
