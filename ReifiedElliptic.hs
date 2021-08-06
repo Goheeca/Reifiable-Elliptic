@@ -24,9 +24,8 @@ import NumericPrelude.Base
 
 import Data.Maybe
 
-import Data.Bit (F2Poly, unF2Poly)
-import qualified Data.Vector.Unboxed as Vector (length)
-import qualified Prelude ((+), fromInteger)
+import Data.Bit (F2Poly)
+import qualified Prelude ((+))
 import BinaryPolynomialOperations
 
 
@@ -55,13 +54,10 @@ reifiedGaloisBinaryField _ modulus =
   ReifiedField
     0
     (Prelude.+)
-    (complementMask Prelude.+)
+    id
     (polMult modulus)
     1
     (polInv modulus)
-    where degree = toInteger . (subtract 1) . Vector.length $ unF2Poly modulus
-          complementMask = Prelude.fromInteger $ (2 ^ degree) - 1
-
 
 -- | The maker of a group of the elliptic curve.
 reifiedStandardEllipticGroup :: Eq a
@@ -78,23 +74,24 @@ reifiedStandardEllipticGroup field linearCoeff =
        (Nothing, q) -> q
        (p, Nothing) -> p
        (Just p@(x_p, y_p), Just q@(x_q, y_q)) ->
-         let verticalSlope | p == q    = y_p == fieldZero
-                           | otherwise = inField (x_q - x_p) == fieldZero
-             two = inField $ one + one
-             three = inField $ one + two
-             slope | p == q    = inField $ (three * x_p ^ 2 + linearCoeff) / (two * y_p)
-                   | otherwise = inField $ (y_q - y_p) / (x_q - x_p)
-             x_r = inField $ slope ^ 2 - x_p - x_q
-             y_r = inField $ slope * (x_p - x_r) - y_p
-         in if verticalSlope
-            then Nothing
-            else Just (x_r, y_r))
+         if verticalSlope
+         then Nothing
+         else let slope | p == q    = inField $ (three' * x_p ^ 2 + linearCoeff) / (two' * y_p)
+                        | otherwise = inField $ (y_q - y_p) / (x_q - x_p)
+                  x_r = inField $ slope ^ 2 - x_p - x_q
+                  y_r = inField $ slope * (x_p - x_r) - y_p
+              in Just (x_r, y_r)
+         where zero' = inField zero
+               two' = inField $ one + one
+               three' = inField $ one + two'
+               verticalSlope | p == q = y_p == zero'
+                             | otherwise = inField (x_q - x_p) == zero')
     -- the additive inverse operation
     (\p -> case p of
        Nothing -> Nothing
        Just (x, y) -> Just (x, inField $ negate y))
     where inField = using field
-          fieldZero = inField zero
+          
 
 -- | The maker of a group of the elliptic curve.
 reifiedKoblitzEllipticGroup :: Eq a
@@ -110,18 +107,19 @@ reifiedKoblitzEllipticGroup field quadCoeff =
     (\p' q' -> case (p', q') of
        (Nothing, q) -> q
        (p, Nothing) -> p
-       (Just (x_p, y_p), Just (x_q, y_q)) ->
-         if x_p == x_q
-         then if inField (y_p + y_q) == x_q
-              then Nothing
-              else let slope = inField $ x_q + y_q / x_q
-                       x_r = inField $ slope ^ 2 + slope + quadCoeff
-                       y_r = inField $ x_q ^ 2 + (slope + one) * x_r
-                   in Just (x_r, y_r)
-         else let slope = inField $ (y_p + y_q) / (x_p + x_q)
-                  x_r = inField $ slope ^ 2 + slope + x_p + x_q + quadCoeff
-                  y_r = inField $ (x_q + x_r) * slope + x_r + y_q
-              in Just (x_r, y_r))
+       (Just p@(x_p, y_p), Just q@(x_q, y_q)) ->
+         if verticalSlope
+         then Nothing
+         else let slope | p == q    = inField $ (three' * x_p ^ 2 + two' * quadCoeff * x_p - y_p) / (two' * y_p + x_p)
+                        | otherwise = inField $ (y_q - y_p) / (x_q - x_p)
+                  x_r = inField $ slope ^ 2 + slope - x_p - x_q - quadCoeff
+                  y_r = inField $ slope * (x_p - x_r) - x_r - y_p
+              in Just (x_r, y_r)
+         where zero' = inField zero
+               two' = inField $ one + one
+               three' = inField $ one + two'
+               verticalSlope | p == q = inField (two' * y_p - x_p) == zero'
+                             | otherwise = inField (x_q - x_p) == zero')
     -- the additive inverse operation
     (\p -> case p of
        Nothing -> Nothing
