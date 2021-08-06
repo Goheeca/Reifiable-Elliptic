@@ -99,9 +99,9 @@ reifiedStandardEllipticGroup field linearCoeff =
 -- | The maker of a group of the elliptic curve.
 reifiedKoblitzEllipticGroup :: Eq a
                             => Def Field.C a                        -- ^ An underlying field
-                            -> a                                    -- ^ The linear coefficient in the equation of the particular elliptic curve
+                            -> a                                    -- ^ The quadratic coefficient in the equation of the particular elliptic curve
                             -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
-reifiedKoblitzEllipticGroup field linearCoeff =
+reifiedKoblitzEllipticGroup field quadCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
     -- the neutral element of addition
@@ -115,15 +115,15 @@ reifiedKoblitzEllipticGroup field linearCoeff =
          then if inField (y_p + y_q) == x_q
               then Nothing
               else let slope = inField $ x_q + y_q / x_q
-                       x_r = inField $ slope ^ 2 + slope + linearCoeff
+                       x_r = inField $ slope ^ 2 + slope + quadCoeff
                        y_r = inField $ x_q ^ 2 + (slope + one) * x_r
                    in Just (x_r, y_r)
          else let slope = inField $ (y_p + y_q) / (x_p + x_q)
-                  x_r = inField $ slope ^ 2 + slope + x_p + x_q + linearCoeff
+                  x_r = inField $ slope ^ 2 + slope + x_p + x_q + quadCoeff
                   y_r = inField $ (x_q + x_r) * slope + x_r + y_q
               in Just (x_r, y_r))
     -- the additive inverse operation
     (\p -> case p of
        Nothing -> Nothing
-       Just (x, y) -> Just (x, inField $ x + y))
+       Just (x, y) -> Just (x, inField $ negate (x + y)))
     where inField = using field
