@@ -31,7 +31,7 @@ import BinaryPolynomialOperations
 
 type EllipticPoint a = Maybe (a,a)
 
--- | The underlying field maker.
+-- | The underlying field maker. GF(p)
 reifiedGaloisPrimeField :: Integer             -- ^ A prime number, the count of elements in the field
                         -> Def Field.C Integer -- ^ A finite field
 reifiedGaloisPrimeField prime =
@@ -47,17 +47,18 @@ reifiedGaloisPrimeField prime =
           totalize2 = liftA totalize
           inverse = \n -> case invertSomeMod (n `modulo` naturalFromInteger prime) of Just (SomeMod r) -> getVal r
 
--- GF(2^n)
-reifiedGaloisBinaryField :: F2Poly -> F2Poly -> Def Field.C F2Poly
-reifiedGaloisBinaryField _ modulus =
-  -- Field: (P(degree - 1) mod modulus, 0, +, -, *, 1, ^-1)
+-- | The underlying field maker. GF(2^d)
+reifiedGaloisBinaryField :: F2Poly             -- ^ A modulus, a polynomial of degree d
+                         -> Def Field.C F2Poly -- ^ A finite field
+reifiedGaloisBinaryField modulus =
+  -- Field: (P(d - 1) mod modulus, 0, +, -, *, 1, ^-1)
   ReifiedField
-    0
-    (Prelude.+)
-    id
-    (polMult modulus)
-    1
-    (polInv modulus)
+    0                 -- the neutral element of addition
+    (Prelude.+)       -- the add operation
+    id                -- the additive inverse operation
+    (polMult modulus) -- the multiply operation
+    1                 -- the neutral element of multiplication
+    (polInv modulus)  -- the multiplicative inverse operation
 
 -- | The maker of a group of the elliptic curve.
 reifiedStandardEllipticGroup :: Eq a

@@ -52,20 +52,20 @@ class EllipticCurve a b | a -> b where
   rank :: Integral c => a c -> NN.Integer
   cofactor :: Integral c => a c -> NN.Integer
 
-toIngr :: Integral a => (b a -> a) -> b a -> Integer
-toIngr fval def = fromIntegral $ fval def
+toIntgr :: Integral a => (b a -> a) -> b a -> Integer
+toIntgr fval def = fromIntegral $ fval def
 
 instance EllipticCurve StandardCurveDef Integer where
-  aCoeff = toIngr aCoeff_s
-  bCoeff = toIngr bCoeff_s
-  generator = \def -> (toIngr x_s def, toIngr y_s def)
+  aCoeff = toIntgr aCoeff_s
+  bCoeff = toIntgr bCoeff_s
+  generator = \def -> (toIntgr x_s def, toIntgr y_s def)
     where x_s = fst . generator_s
           y_s = snd . generator_s
   rank = rank_s
   cofactor = cofactor_s
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
-                            (reifiedGaloisPrimeField $ toIngr prime_s curve)
+                            (reifiedGaloisPrimeField $ toIntgr prime_s curve)
                             $ aCoeff curve
 
 instance (Show a, Integral a) => Show (StandardCurveDef a) where
@@ -80,9 +80,6 @@ instance (Show a, Integral a) => Show (StandardCurveDef a) where
 toBinPoly :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
 toBinPoly fval def = fromInteger . toInteger $ fval def
 
-modulus_BinPoly :: Integral a => KoblitzCurveDef a -> F2Poly
-modulus_BinPoly def = fromInteger . toInteger $ modulus_k def
-
 instance EllipticCurve KoblitzCurveDef F2Poly where
   aCoeff = toBinPoly aCoeff_k
   bCoeff = toBinPoly bCoeff_k
@@ -93,12 +90,12 @@ instance EllipticCurve KoblitzCurveDef F2Poly where
   cofactor = cofactor_k
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
-                            (reifiedGaloisBinaryField (toBinPoly degree_k curve) (modulus_BinPoly curve))
+                            (reifiedGaloisBinaryField $ toBinPoly modulus_k curve)
                             $ aCoeff curve
 
 instance (Show a, Integral a) => Show (KoblitzCurveDef a) where
   show eC =
-    "Galois Binary Field (modulus): " ++ (show $ modulus_BinPoly eC)
+    "Galois Binary Field (modulus): " ++ (show $ toBinPoly modulus_k eC)
     ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ (show $ aCoeff eC) ++ "*x^2 + " ++ (show $ bCoeff eC)
     ++ "\nGenerator (G): " ++ (show $ generator eC)
     ++ "\nOrder (n): " ++ (show $ rank eC)
