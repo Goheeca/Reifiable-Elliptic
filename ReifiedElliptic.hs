@@ -31,6 +31,7 @@ import BinaryPolynomialOperations
 
 type EllipticPoint a = Maybe (a,a)
 
+
 -- | The underlying field maker. GF(p)
 reifiedGaloisPrimeField :: Integer             -- ^ A prime number, the count of elements in the field
                         -> Def Field.C Integer -- ^ A finite field
@@ -60,7 +61,8 @@ reifiedGaloisBinaryField modulus =
     1                 -- the neutral element of multiplication
     (polInv modulus)  -- the multiplicative inverse operation
 
--- | The maker of a group of the elliptic curve.
+
+-- | The maker of a group of the elliptic curve. <https://sefiks.com/2016/03/13/the-math-behind-elliptic-curve-cryptography/ The derivation>.
 reifiedStandardEllipticGroup :: Eq a
                              => Def Field.C a                        -- ^ An underlying field
                              -> a                                    -- ^ The linear coefficient in the equation of the particular elliptic curve
@@ -94,7 +96,7 @@ reifiedStandardEllipticGroup field linearCoeff =
     where inField = using field
           
 
--- | The maker of a group of the elliptic curve.
+-- | The maker of a group of the elliptic curve. <https://sefiks.com/2016/03/13/the-math-behind-elliptic-curves-over-binary-field/ The derivation>.
 reifiedKoblitzEllipticGroup :: Eq a
                             => Def Field.C a                        -- ^ An underlying field
                             -> a                                    -- ^ The quadratic coefficient in the equation of the particular elliptic curve
