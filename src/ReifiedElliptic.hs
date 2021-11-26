@@ -10,19 +10,13 @@ module ReifiedElliptic (
 ) where
 
 import ReifiedAlgebra
-
-import Control.Applicative (liftA)
-import Math.NumberTheory.Moduli (invertSomeMod, modulo, getVal, SomeMod(..))
-import GHC.Natural (naturalFromInteger)
-
 import qualified Algebra.Field as Field
 import qualified Algebra.Additive as AbelianGroup
-import qualified Algebra.Monoid as Monoid
-
 import NumericPrelude.Numeric
 import NumericPrelude.Base
 
-import Data.Maybe
+import Math.NumberTheory.Moduli (invertSomeMod, modulo, getVal, SomeMod(..))
+import GHC.Natural (naturalFromInteger)
 
 import Data.Bit (F2Poly)
 import qualified Prelude ((+))
@@ -45,7 +39,7 @@ reifiedGaloisPrimeField prime =
     1                    -- the neutral element of multiplication
     inverse              -- the multiplicative inverse operation
     where totalize = (`mod` prime)
-          totalize2 = liftA totalize
+          totalize2 = fmap totalize
           inverse = \n -> case invertSomeMod (n `modulo` naturalFromInteger prime) of Just (SomeMod r) -> getVal r
 
 -- | The underlying field maker. GF(2^d)

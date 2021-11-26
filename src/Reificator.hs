@@ -1,7 +1,6 @@
-{-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances, TypeFamilies #-}
-{-# LANGUAGE ConstraintKinds, KindSignatures, PolyKinds, TypeOperators #-}
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables #-}
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, PolyKinds, TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | Taken from an <https://www.schoolofhaskell.com/user/thoughtpolice/using-reflection article> about reflection in Haskell
 module Reificator where
@@ -10,17 +9,18 @@ import Data.Proxy
 import Data.Reflection
 import Data.Constraint
 import Data.Constraint.Unsafe
+import Data.Kind
 
 --------------------------------------------------------------------------------
 -- Lift/ReifiableConstraint machinery.
 
 -- | Prepares an value to be used with reified constraint
-newtype Lift (p :: * -> Constraint) (a :: *) (s :: *) = Lift { lower :: a }
+newtype Lift (p :: Type -> Constraint) (a :: Type) (s :: Type) = Lift { lower :: a }
 
 -- | Kind of a first-class constraint
 class ReifiableConstraint p where
   -- | A constraint builder
-  data Def (p :: * -> Constraint) (a :: *) :: *
+  data Def (p :: Type -> Constraint) (a :: Type) :: Type
   -- | Uses a constraint builder
   reifiedIns :: Reifies s (Def p a) :- p (Lift p a s)
 

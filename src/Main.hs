@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 {- | The following simple example incorporates curve defined in <http://crypto-world.info/klima/2002/chip-2002-09-134-136.pdf this article> (czech only).
 
 The example itself:
@@ -34,34 +32,37 @@ useCurve :: (EllipticCurve a b, Show b, Integral c, Show (a c)) => a c -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
   bobSecret <- randomSecretKey eC
-  alicePublic <- return $ publicKey eC aliceSecret
-  bobPublic <- return $ publicKey eC bobSecret
-  aliceSharedSecret <- return $ sharedSecret eC aliceSecret bobPublic
-  bobSharedSecret <- return $ sharedSecret eC bobSecret alicePublic
-  --curveInfo eC
-  putStrLn $ show eC
+  let alicePublic = publicKey eC aliceSecret
+  let bobPublic = publicKey eC bobSecret
+  let aliceSharedSecret = sharedSecret eC aliceSecret bobPublic
+  let bobSharedSecret = sharedSecret eC bobSecret alicePublic
+  print eC
   putStrLn ""
-  putStrLn $ "Alice"
-  putStrLn $ "SECRET: " ++ (show aliceSecret)
-  putStrLn $ "PUBLIC: " ++ (show alicePublic)
+  putStrLn "Alice"
+  putStrLn $ "SECRET: " ++ show aliceSecret
+  putStrLn $ "PUBLIC: " ++ show alicePublic
   putStrLn ""
-  putStrLn $ "Bob"
-  putStrLn $ "SECRET: " ++ (show bobSecret)
-  putStrLn $ "PUBLIC: " ++ (show bobPublic)
+  putStrLn "Bob"
+  putStrLn $ "SECRET: " ++ show bobSecret
+  putStrLn $ "PUBLIC: " ++ show bobPublic
   putStrLn ""
-  putStrLn $ "SHARED"
-  putStrLn $ "Alice: " ++ (show aliceSharedSecret)
-  putStrLn $ "Bob: " ++ (show bobSharedSecret)
+  putStrLn "SHARED"
+  putStrLn $ "Alice: " ++ show aliceSharedSecret
+  putStrLn $ "Bob: " ++ show bobSharedSecret
 
 -- | The example of a small curve from the aforementioned hyperlink
+curveTest :: StandardCurveDef Integer
 curveTest = StandardCurveDef 23 1 1 (13, 16) 7 4
 
 -- | The prime number for P-192 curve
+gp192 :: Integer
 gp192 = 6277101735386680763835789423207666416083908700390324961279
 -- | The prime number for P-521 curve
+gp521 :: Integer
 gp521 = 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
 
 -- | The standard NIST curve P-192
+curveP192 :: StandardCurveDef Integer
 curveP192 =
   StandardCurveDef
     gp192
@@ -72,6 +73,7 @@ curveP192 =
     1
 
 -- | The standard NIST curve P-521
+curveP521 :: StandardCurveDef Integer
 curveP521 =
   StandardCurveDef
     gp521
@@ -81,6 +83,7 @@ curveP521 =
     6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
     1
 
+-- | The Koblitz NIST curve K-571
 curveK571 :: KoblitzCurveDef Integer
 curveK571 =
   KoblitzCurveDef

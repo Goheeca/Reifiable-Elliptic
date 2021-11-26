@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 -- | A collection of functions used in the Diffie-Hellman protocol.
 module DiffieHellman (
   publicKey,
@@ -11,8 +9,6 @@ import Elliptic
 import ScalarMultiplication
 
 import System.Random
-import Control.Monad (liftM)
-import Data.Maybe
 import qualified NumericPrelude.Numeric as N (fromInteger)
 import qualified Number.NonNegative as NN
 
@@ -35,4 +31,4 @@ sharedSecret curve secretKey publicKey = inElliptic curve $ publicKey +* secretK
 randomSecretKey :: (EllipticCurve a b, Integral c)
                 => a c                     -- ^ a curve definition
                 -> IO NN.Integer           -- ^ a random private key
-randomSecretKey curve = liftM N.fromInteger $ randomRIO (1, (toInteger . rank $ curve) - 1)
+randomSecretKey curve = N.fromInteger <$> randomRIO (1, (toInteger . rank $ curve) - 1)

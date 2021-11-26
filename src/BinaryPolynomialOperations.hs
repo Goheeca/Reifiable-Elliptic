@@ -14,9 +14,8 @@ polMult :: F2Poly -> F2Poly -> F2Poly -> F2Poly
 polMult modulus a b = (a * b) `mod` modulus
 
 polInv :: F2Poly -> F2Poly -> F2Poly
-polInv p a = polInv_ 0 1 p a
-  where polInv_ t nt r nr
-          | nr == 0   = t
-          | otherwise =
-            let (quotient, remainder) = polDiv p r nr
-            in polInv_ nt (t + (polMult p quotient nt)) nr remainder
+polInv modulus a = extendedEuclid 0 1 modulus a
+  where extendedEuclid t newt r newr
+          | newr == 0 = t
+          | otherwise = extendedEuclid newt (t - polMult modulus quotient newt) newr remainder
+          where (quotient, remainder) = polDiv modulus r newr

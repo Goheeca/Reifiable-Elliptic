@@ -1,5 +1,4 @@
-{-# LANGUAGE Rank2Types, FlexibleContexts, UndecidableInstances #-}
-{-# LANGUAGE TypeFamilies, FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies, FlexibleInstances, UndecidableInstances #-}
 
 -- | Builders of algebraic structures, they build the structure from given operations and significant elements.
 module ReifiedAlgebra (

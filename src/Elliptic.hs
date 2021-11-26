@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types, FlexibleContexts, MultiParamTypeClasses, FunctionalDependencies #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts, FunctionalDependencies #-}
 
 -- | An encapsulation of the computations in the reified algebraic structures.
 module Elliptic (
@@ -70,11 +70,11 @@ instance EllipticCurve StandardCurveDef Integer where
 
 instance (Show a, Integral a) => Show (StandardCurveDef a) where
   show eC =
-    "Galois Prime Field (p): " ++ (show $ prime_s eC)
-    ++ "\nCurve (a, b): y^2 = x^3 + " ++ (show $ aCoeff eC) ++ "*x + " ++ (show $ bCoeff eC)
-    ++ "\nGenerator (G): " ++ (show $ generator eC)
-    ++ "\nOrder (n): " ++ (show $ rank eC)
-    ++ "\nCofactor (h): " ++ (show $ cofactor eC)
+    "Galois Prime Field (p): " ++ show (prime_s eC)
+    ++ "\nCurve (a, b): y^2 = x^3 + " ++ show (aCoeff eC) ++ "*x + " ++ show (bCoeff eC)
+    ++ "\nGenerator (G): " ++ show (generator eC)
+    ++ "\nOrder (n): " ++ show (rank eC)
+    ++ "\nCofactor (h): " ++ show (cofactor eC)
 
 
 toBinPoly :: (Integral a, Integral b) => (KoblitzCurveDef a -> b) -> KoblitzCurveDef a -> F2Poly
@@ -95,9 +95,9 @@ instance EllipticCurve KoblitzCurveDef F2Poly where
 
 instance (Show a, Integral a) => Show (KoblitzCurveDef a) where
   show eC =
-    "Galois Binary Field (modulus): " ++ (show $ toBinPoly modulus_k eC)
-    ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ (show $ aCoeff eC) ++ "*x^2 + " ++ (show $ bCoeff eC)
-    ++ "\nGenerator (G): " ++ (show $ generator eC)
-    ++ "\nOrder (n): " ++ (show $ rank eC)
-    ++ "\nCofactor (h): " ++ (show $ cofactor eC)
+    "Galois Binary Field (modulus): " ++ show (toBinPoly modulus_k eC)
+    ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ show (aCoeff eC) ++ "*x^2 + " ++ show (bCoeff eC)
+    ++ "\nGenerator (G): " ++ show (generator eC)
+    ++ "\nOrder (n): " ++ show (rank eC)
+    ++ "\nCofactor (h): " ++ show (cofactor eC)
 
