@@ -10,13 +10,19 @@ import ReifiedElliptic
 import Elliptic
 import UnrefinedElliptic
 import Reificator (using)
+import BinaryPolynomialOperations (polMult)
 
 import Refined
 import Math.NumberTheory.Primes.Testing (isCertifiedPrime)
+import Math.NumberTheory.Roots (integerSquareRoot)
+import Math.NumberTheory.Logarithms (integerLog2)
 import Number.NonNegative (fromNumber)
 import Data.Typeable (Typeable, typeOf)
 import Data.Text (pack)
 import Data.Bit (F2Poly)
+
+hasseTheorem :: Integral a => a -> a -> a -> Bool
+hasseTheorem cofactor order q = abs (cofactor * order - (q + 1)) <= 2 * (1 + integerSquareRoot q)
 
 
 data StandardCurveDefValidator
@@ -24,8 +30,14 @@ data StandardCurveDefValidator
 instance (Typeable a, Integral a) => Predicate StandardCurveDefValidator (UnrefinedStandardCurveDef a) where
   validate _ def
     | not $ isCertifiedPrime . toInteger $ prime_s def = Just $ RefineOtherException (typeOf def) (pack "Modulus isn't prime")
-    | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf def) (pack "Cofactor isn't positive")
+    | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf def) (pack "Cofactor isn't strictly positive")
+    | -16 * (4 * (aCoeff_s def) ^ 3 + 27 * (bCoeff_s def) ^ 2) == 0 = Just $ RefineOtherException (typeOf def) (pack "The curve is singular")
+    | not $ hasseTheorem (cofactor_s def) (order_s def) (prime_s def) = Just $ RefineOtherException (typeOf def) (pack "Hasse's theorem not satisfied")
+    -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
+    | (y^2 - (x^3 + aCoeff_s def * x + bCoeff_s def)) `mod` (prime_s def) /= 0 = Just $ RefineOtherException (typeOf def) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
+    where x = fst . generator_s $ def
+          y = snd . generator_s $ def
 
 type RefinedStandardCurveDef' a = Refined StandardCurveDefValidator (UnrefinedStandardCurveDef a)
 -- | A definition of the elliptic curve
@@ -35,7 +47,18 @@ newtype RefinedStandardCurveDef a = RefinedStandardCurveDef { unRefinedStandardC
 data KoblitzCurveDefValidator
 
 instance (Typeable a, Integral a) => Predicate KoblitzCurveDefValidator (UnrefinedKoblitzCurveDef a) where
-  validate _ def = Nothing
+  validate _ def
+    | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf def) (pack "The degree doesn't agree with the polynomial")
+    -- TODO check modulus_k is a primitive polynomial or at least an irreducible polynomial (Cantor–Zassenhaus algorithm or Berlekamp's algorithm)
+    | 0 >= (toInteger $ cofactor_k def) = Just $ RefineOtherException (typeOf def) (pack "Cofactor isn't strictly positive")
+    | - ((bCoeff_k def) + 12 * (aCoeff_k def) * (bCoeff_k def) + 48 * (aCoeff_k def) ^ 2 * (bCoeff_k def) + 64 * (aCoeff_k def) ^ 3 * (bCoeff_k def) + 432 * (bCoeff_k def) ^ 2) == 0 = Just $ RefineOtherException (typeOf def) (pack "The curve is singular")
+    | not $ hasseTheorem (cofactor_k def) (order_k def) (2 ^ (degree_k def)) = Just $ RefineOtherException (typeOf def) (pack "Hasse's theorem not satisfied")
+    -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
+    | polMult m y y + polMult m x y - (polMult m x (polMult m x x) + polMult m (fromIntegral $ aCoeff_k def) (polMult m x x) + (fromIntegral $ bCoeff_k def)) /= 0 = Just $ RefineOtherException (typeOf def) (pack "The generator doesn't lie on the curve")
+    | otherwise = Nothing
+    where m = fromIntegral $ modulus_k def
+          x = fromIntegral $ fst . generator_k $ def
+          y = fromIntegral $ snd . generator_k $ def
 
 type RefinedKoblitzCurveDef' a = Refined KoblitzCurveDefValidator (UnrefinedKoblitzCurveDef a)
 -- | A definition of the elliptic curve
@@ -79,6 +102,7 @@ instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
     where ellipticGroup = reifiedKoblitzEllipticGroup
                             (reifiedGaloisBinaryField $ refiner_k modulus_k curve)
                             $ aCoeff curve
+
 
 instance (Show a, Integral a) => Show (RefinedStandardCurveDef a) where
   show eC =
