@@ -33,7 +33,7 @@ instance (Typeable a, Integral a) => Predicate StandardCurveDefValidator (Unrefi
     | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
     | -16 * (4 * (aCoeff_s def) ^ 3 + 27 * (bCoeff_s def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
     | not $ hasseTheorem (cofactor_s def) (order_s def) (prime_s def) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
-    -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
+    -- TODO check number of points exactly via Schoof algorithm or SEA algorithm
     | (y^2 - (x^3 + aCoeff_s def * x + bCoeff_s def)) `mod` (prime_s def) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
     where x = fst . generator_s $ def
@@ -53,7 +53,7 @@ instance (Typeable a, Integral a) => Predicate KoblitzCurveDefValidator (Unrefin
     | 0 >= (toInteger $ cofactor_k def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
     | - ((bCoeff_k def) + 12 * (aCoeff_k def) * (bCoeff_k def) + 48 * (aCoeff_k def) ^ 2 * (bCoeff_k def) + 64 * (aCoeff_k def) ^ 3 * (bCoeff_k def) + 432 * (bCoeff_k def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
     | not $ hasseTheorem (cofactor_k def) (order_k def) (2 ^ (degree_k def)) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
-    -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
+    -- TODO check number of points exactly via Schoof algorithm or SEA algorithm
     | polMult m y y + polMult m x y - (polMult m x (polMult m x x) + polMult m (fromIntegral $ aCoeff_k def) (polMult m x x) + (fromIntegral $ bCoeff_k def)) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
     where m = fromIntegral $ modulus_k def
