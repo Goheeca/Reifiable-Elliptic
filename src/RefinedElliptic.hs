@@ -28,13 +28,13 @@ hasseTheorem cofactor order q = abs (cofactor * order - (q + 1)) <= 2 * (1 + int
 data StandardCurveDefValidator
 
 instance (Typeable a, Integral a) => Predicate StandardCurveDefValidator (UnrefinedStandardCurveDef a) where
-  validate _ def
-    | not $ isCertifiedPrime . toInteger $ prime_s def = Just $ RefineOtherException (typeOf def) (pack "Modulus isn't prime")
-    | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf def) (pack "Cofactor isn't strictly positive")
-    | -16 * (4 * (aCoeff_s def) ^ 3 + 27 * (bCoeff_s def) ^ 2) == 0 = Just $ RefineOtherException (typeOf def) (pack "The curve is singular")
-    | not $ hasseTheorem (cofactor_s def) (order_s def) (prime_s def) = Just $ RefineOtherException (typeOf def) (pack "Hasse's theorem not satisfied")
+  validate pred def
+    | not $ isCertifiedPrime . toInteger $ prime_s def = Just $ RefineOtherException (typeOf pred) (pack "Modulus isn't prime")
+    | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
+    | -16 * (4 * (aCoeff_s def) ^ 3 + 27 * (bCoeff_s def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
+    | not $ hasseTheorem (cofactor_s def) (order_s def) (prime_s def) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
     -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
-    | (y^2 - (x^3 + aCoeff_s def * x + bCoeff_s def)) `mod` (prime_s def) /= 0 = Just $ RefineOtherException (typeOf def) (pack "The generator doesn't lie on the curve")
+    | (y^2 - (x^3 + aCoeff_s def * x + bCoeff_s def)) `mod` (prime_s def) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
     where x = fst . generator_s $ def
           y = snd . generator_s $ def
@@ -47,14 +47,14 @@ newtype RefinedStandardCurveDef a = RefinedStandardCurveDef { unRefinedStandardC
 data KoblitzCurveDefValidator
 
 instance (Typeable a, Integral a) => Predicate KoblitzCurveDefValidator (UnrefinedKoblitzCurveDef a) where
-  validate _ def
-    | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf def) (pack "The degree doesn't agree with the polynomial")
+  validate pred def
+    | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf pred) (pack "The degree doesn't agree with the polynomial")
     -- TODO check modulus_k is a primitive polynomial or at least an irreducible polynomial (Cantor–Zassenhaus algorithm or Berlekamp's algorithm)
-    | 0 >= (toInteger $ cofactor_k def) = Just $ RefineOtherException (typeOf def) (pack "Cofactor isn't strictly positive")
-    | - ((bCoeff_k def) + 12 * (aCoeff_k def) * (bCoeff_k def) + 48 * (aCoeff_k def) ^ 2 * (bCoeff_k def) + 64 * (aCoeff_k def) ^ 3 * (bCoeff_k def) + 432 * (bCoeff_k def) ^ 2) == 0 = Just $ RefineOtherException (typeOf def) (pack "The curve is singular")
-    | not $ hasseTheorem (cofactor_k def) (order_k def) (2 ^ (degree_k def)) = Just $ RefineOtherException (typeOf def) (pack "Hasse's theorem not satisfied")
+    | 0 >= (toInteger $ cofactor_k def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
+    | - ((bCoeff_k def) + 12 * (aCoeff_k def) * (bCoeff_k def) + 48 * (aCoeff_k def) ^ 2 * (bCoeff_k def) + 64 * (aCoeff_k def) ^ 3 * (bCoeff_k def) + 432 * (bCoeff_k def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
+    | not $ hasseTheorem (cofactor_k def) (order_k def) (2 ^ (degree_k def)) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
     -- TODO check number of points exactly via Shoof algorithm or SEA algorithm
-    | polMult m y y + polMult m x y - (polMult m x (polMult m x x) + polMult m (fromIntegral $ aCoeff_k def) (polMult m x x) + (fromIntegral $ bCoeff_k def)) /= 0 = Just $ RefineOtherException (typeOf def) (pack "The generator doesn't lie on the curve")
+    | polMult m y y + polMult m x y - (polMult m x (polMult m x x) + polMult m (fromIntegral $ aCoeff_k def) (polMult m x x) + (fromIntegral $ bCoeff_k def)) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
     where m = fromIntegral $ modulus_k def
           x = fromIntegral $ fst . generator_k $ def
