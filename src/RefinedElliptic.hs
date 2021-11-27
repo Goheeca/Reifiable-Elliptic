@@ -54,7 +54,7 @@ instance EllipticCurve RefinedStandardCurveDef Integer where
   generator = \def -> (refiner_s x_s def, refiner_s y_s def)
     where x_s = fst . generator_s
           y_s = snd . generator_s
-  order = fromNumber . toInteger . rank_s . unrefine . unRefinedStandardCurveDef
+  order = fromNumber . toInteger . order_s . unrefine . unRefinedStandardCurveDef
   cofactor = fromNumber . toInteger . cofactor_s . unrefine . unRefinedStandardCurveDef
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
@@ -73,7 +73,7 @@ instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
   generator = \def -> (refiner_k x_k def, refiner_k y_k def)
     where x_k = fst . generator_k
           y_k = snd . generator_k
-  order = fromNumber . toInteger . rank_k . unrefine . unRefinedKoblitzCurveDef
+  order = fromNumber . toInteger . order_k . unrefine . unRefinedKoblitzCurveDef
   cofactor = fromNumber . toInteger . cofactor_k . unrefine . unRefinedKoblitzCurveDef
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup

@@ -15,7 +15,7 @@ data UnrefinedStandardCurveDef a =
     aCoeff_s :: a,
     bCoeff_s :: a,
     generator_s :: (a, a),
-    rank_s :: a,
+    order_s :: a,
     cofactor_s :: a
   }
   deriving Lift
@@ -28,7 +28,7 @@ data UnrefinedKoblitzCurveDef a =
     aCoeff_k :: a,
     bCoeff_k :: a,
     generator_k :: (a, a),
-    rank_k :: a,
+    order_k :: a,
     cofactor_k :: a
   }
   deriving Lift
