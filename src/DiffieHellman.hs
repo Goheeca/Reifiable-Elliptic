@@ -31,4 +31,4 @@ sharedSecret curve secretKey publicKey = inElliptic curve $ publicKey +* secretK
 randomSecretKey :: (EllipticCurve a b, Integral c)
                 => a c                     -- ^ a curve definition
                 -> IO NN.Integer           -- ^ a random private key
-randomSecretKey curve = N.fromInteger <$> randomRIO (1, (toInteger . rank $ curve) - 1)
+randomSecretKey curve = N.fromInteger <$> randomRIO (1, (toInteger . order $ curve) - 1)
