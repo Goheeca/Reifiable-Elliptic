@@ -22,5 +22,5 @@ class EllipticCurve a b | a -> b where
   aCoeff :: Integral c => a c -> b
   bCoeff :: Integral c => a c -> b
   generator :: Integral c => a c -> (b, b)
-  rank :: Integral c => a c -> NN.Integer
+  order :: Integral c => a c -> NN.Integer
   cofactor :: Integral c => a c -> NN.Integer
