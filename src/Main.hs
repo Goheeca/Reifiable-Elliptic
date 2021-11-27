@@ -84,7 +84,7 @@ curveP521 =
     1
 
 -- | The Koblitz NIST curve K-571
-curveK571 :: KoblitzCurveDef Integer
+curveK571 :: KoblitzCurveDef F2Poly
 curveK571 =
   KoblitzCurveDef
     571

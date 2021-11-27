@@ -6,6 +6,7 @@ module Elliptic (
   KoblitzCurveDef(..),
   EllipticPoint,
   EllipticCurve(..),
+  F2Poly,
 ) where
 
 import ReifiedElliptic
@@ -95,7 +96,7 @@ instance EllipticCurve KoblitzCurveDef F2Poly where
 
 instance (Show a, Integral a) => Show (KoblitzCurveDef a) where
   show eC =
-    "Galois Binary Field (modulus): " ++ show (toBinPoly modulus_k eC)
+    "Galois Binary Field (modulus): " ++ show (modulus_k eC)
     ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ show (aCoeff eC) ++ "*x^2 + " ++ show (bCoeff eC)
     ++ "\nGenerator (G): " ++ show (generator eC)
     ++ "\nOrder (n): " ++ show (order eC)
