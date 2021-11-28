@@ -19,25 +19,37 @@ import Math.NumberTheory.Logarithms (integerLog2)
 import Data.Typeable (Typeable, typeOf)
 import Data.Text (pack)
 import Data.Bit (F2Poly)
+import EquationTest (standardEquationTest, koblitzEquationTest)
 
 
 hasseTheorem :: Integer -> Integer -> Integer -> Bool
 hasseTheorem cofactor order q = abs (cofactor * order - (q + 1)) <= 2 * (1 + integerSquareRoot q)
 
+toIntgr :: Integral a => (b a -> a) -> b a -> Integer
+toIntgr fval def = fromIntegral $ fval def
+
+refiner_s :: Integral a => (UnrefinedStandardCurveDef a -> a) -> RefinedStandardCurveDef a -> Integer
+refiner_s fval = toIntgr $ fval . unrefine . unRefinedStandardCurveDef
+
+toBinPoly :: (Integral a, Integral b) => (c a -> b) -> c a -> F2Poly
+toBinPoly fval def = fromInteger . toInteger $ fval def
+
+refiner_k :: (Integral a, Integral b) => (UnrefinedKoblitzCurveDef a -> b) -> RefinedKoblitzCurveDef a -> F2Poly
+refiner_k fval = toBinPoly $ fval . unrefine . unRefinedKoblitzCurveDef
 
 data StandardCurveDefValidator
 
 instance (Typeable a, Integral a) => Predicate StandardCurveDefValidator (UnrefinedStandardCurveDef a) where
   validate pred def
     | not $ isCertifiedPrime . toInteger $ prime_s def = Just $ RefineOtherException (typeOf pred) (pack "Modulus isn't prime")
-    | 0 >= (toInteger $ cofactor_s def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
-    | -16 * (4 * (aCoeff_s def) ^ 3 + 27 * (bCoeff_s def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
+    | 0 >= toInteger (cofactor_s def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
+    | -16 * (4 * aCoeff_s def ^ 3 + 27 * bCoeff_s def ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
     | not $ hasseTheorem (toInteger $ cofactor_s def) (toInteger $ order_s def) (toInteger $ prime_s def) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
     -- TODO check number of points exactly via Schoof algorithm or SEA algorithm
-    | (y^2 - (x^3 + aCoeff_s def * x + bCoeff_s def)) `mod` (prime_s def) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
+    | not $ standardEquationTest (toIntgr prime_s def) (toIntgr aCoeff_s def) (toIntgr bCoeff_s def) x y = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
-    where x = fst . generator_s $ def
-          y = snd . generator_s $ def
+    where x = fromIntegral $ fst . generator_s $ def
+          y = fromIntegral $ snd . generator_s $ def
 
 type RefinedStandardCurveDef' a = Refined StandardCurveDefValidator (UnrefinedStandardCurveDef a)
 -- | A definition of the elliptic curve
@@ -50,26 +62,19 @@ instance (Typeable a, Integral a) => Predicate KoblitzCurveDefValidator (Unrefin
   validate pred def
     | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf pred) (pack "The degree doesn't agree with the polynomial")
     -- TODO check modulus_k is a primitive polynomial or at least an irreducible polynomial (Cantor–Zassenhaus algorithm or Berlekamp's algorithm)
-    | 0 >= (toInteger $ cofactor_k def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
-    | - ((bCoeff_k def) + 12 * (aCoeff_k def) * (bCoeff_k def) + 48 * (aCoeff_k def) ^ 2 * (bCoeff_k def) + 64 * (aCoeff_k def) ^ 3 * (bCoeff_k def) + 432 * (bCoeff_k def) ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
-    | not $ hasseTheorem (toInteger $ cofactor_k def) (toInteger $ order_k def) (2 ^ (degree_k def)) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
+    | 0 >= toInteger (cofactor_k def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
+    | - (bCoeff_k def + 12 * aCoeff_k def * bCoeff_k def + 48 * aCoeff_k def ^ 2 * bCoeff_k def + 64 * aCoeff_k def ^ 3 * bCoeff_k def + 432 * bCoeff_k def ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
+    | not $ hasseTheorem (toInteger $ cofactor_k def) (toInteger $ order_k def) (2 ^ toInteger (degree_k def)) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
     -- TODO check number of points exactly via Schoof algorithm or SEA algorithm
-    | polMult m y y + polMult m x y - (polMult m x (polMult m x x) + polMult m (fromIntegral $ aCoeff_k def) (polMult m x x) + (fromIntegral $ bCoeff_k def)) /= 0 = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
+    | not $ koblitzEquationTest (toBinPoly modulus_k def) (toBinPoly aCoeff_k def) (toBinPoly bCoeff_k def) x y = Just $ RefineOtherException (typeOf pred) (pack "The generator doesn't lie on the curve")
     | otherwise = Nothing
-    where m = fromIntegral $ modulus_k def
-          x = fromIntegral $ fst . generator_k $ def
+    where x = fromIntegral $ fst . generator_k $ def
           y = fromIntegral $ snd . generator_k $ def
 
 type RefinedKoblitzCurveDef' a = Refined KoblitzCurveDefValidator (UnrefinedKoblitzCurveDef a)
 -- | A definition of the elliptic curve
 newtype RefinedKoblitzCurveDef a = RefinedKoblitzCurveDef { unRefinedKoblitzCurveDef :: (RefinedKoblitzCurveDef' a)}
 
-
-toIntgr :: Integral a => (b a -> a) -> b a -> Integer
-toIntgr fval def = fromIntegral $ fval def
-
-refiner_s :: Integral a => (UnrefinedStandardCurveDef a -> a) -> RefinedStandardCurveDef a -> Integer
-refiner_s fval = toIntgr $ fval . unrefine . unRefinedStandardCurveDef
 
 instance EllipticCurve RefinedStandardCurveDef Integer where
   aCoeff = refiner_s aCoeff_s
@@ -83,12 +88,6 @@ instance EllipticCurve RefinedStandardCurveDef Integer where
     where ellipticGroup = reifiedStandardEllipticGroup
                             (reifiedGaloisPrimeField $ refiner_s prime_s curve)
                             $ aCoeff curve
-
-toBinPoly :: (Integral a, Integral b) => (c a -> b) -> c a -> F2Poly
-toBinPoly fval def = fromInteger . toInteger $ fval def
-
-refiner_k :: (Integral a, Integral b) => (UnrefinedKoblitzCurveDef a -> b) -> RefinedKoblitzCurveDef a -> F2Poly
-refiner_k fval = toBinPoly $ fval . unrefine . unRefinedKoblitzCurveDef
 
 instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
   aCoeff = refiner_k aCoeff_k
