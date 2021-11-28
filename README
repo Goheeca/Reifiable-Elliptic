@@ -13,7 +13,7 @@ Run:
 cabal run
 
 Documentation:
-cabal haddock --executables --haddock-options="-q relative"
+cabal haddock --haddock-executables
 
 Stack:
 
