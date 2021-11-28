@@ -16,8 +16,6 @@ import Refined
 import Math.NumberTheory.Primes.Testing (isCertifiedPrime)
 import Math.NumberTheory.Roots (integerSquareRoot)
 import Math.NumberTheory.Logarithms (integerLog2)
-import Number.NonNegative (fromNumber)
-import qualified Number.NonNegative as NN
 import Data.Typeable (Typeable, typeOf)
 import Data.Text (pack)
 import Data.Bit (F2Poly)
@@ -79,8 +77,8 @@ instance EllipticCurve RefinedStandardCurveDef Integer where
   generator = \def -> (refiner_s x_s def, refiner_s y_s def)
     where x_s = fst . generator_s
           y_s = snd . generator_s
-  order = fromNumber . toInteger . order_s . unrefine . unRefinedStandardCurveDef
-  cofactor = fromNumber . toInteger . cofactor_s . unrefine . unRefinedStandardCurveDef
+  order = order_s . unrefine . unRefinedStandardCurveDef
+  cofactor = cofactor_s . unrefine . unRefinedStandardCurveDef
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
                             (reifiedGaloisPrimeField $ refiner_s prime_s curve)
@@ -98,8 +96,8 @@ instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
   generator = \def -> (refiner_k x_k def, refiner_k y_k def)
     where x_k = fst . generator_k
           y_k = snd . generator_k
-  order = fromNumber . toInteger . order_k . unrefine . unRefinedKoblitzCurveDef
-  cofactor = fromNumber . toInteger . cofactor_k . unrefine . unRefinedKoblitzCurveDef
+  order = order_k . unrefine . unRefinedKoblitzCurveDef
+  cofactor = cofactor_k . unrefine . unRefinedKoblitzCurveDef
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
                             (reifiedGaloisBinaryField $ refiner_k modulus_k curve)
