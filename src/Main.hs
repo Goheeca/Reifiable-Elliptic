@@ -83,9 +83,9 @@ curveP521 = RefinedStandardCurveDef
   )
 
 -- | The Koblitz NIST curve K-571
-curveK571 :: RefinedKoblitzCurveDef Integer
+curveK571 :: RefinedKoblitzCurveDef F2Poly
 curveK571 = RefinedKoblitzCurveDef
-  $$(refineTH $ UnrefinedKoblitzCurveDef @Integer
+  $$(refineTH $ UnrefinedKoblitzCurveDef @F2Poly
     571
     (2^571+2^10+2^5+2^2+2^0)
     0

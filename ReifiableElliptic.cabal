@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                ReifiableElliptic
-version:             0.1.4.2
+version:             0.1.4.3
 synopsis:            Shows applied elliptic curves for the Diffie-Hellman key exchange
 -- description:         
 license:             PublicDomain
@@ -19,7 +19,6 @@ executable ReifiableElliptic
   main-is:             Main.hs
   other-modules:       BinaryPolynomialOperations, DiffieHellman, Elliptic, Reificator, ReifiedAlgebra, ReifiedElliptic, ScalarMultiplication, RefinedElliptic, UnrefinedElliptic
   other-extensions:    NoImplicitPrelude, Rank2Types, FlexibleContexts, UndecidableInstances, TypeFamilies, FlexibleInstances, ConstraintKinds, KindSignatures, PolyKinds, TypeOperators, MultiParamTypeClasses, ScopedTypeVariables, FunctionalDependencies
-  build-depends:       base >=4.7, arithmoi >=0.4, numeric-prelude >=0.4, reflection >=2.1, constraints >=0.8, random >=1.0, bitvec >= 1.1.1.0, refined >= 0.6.2, text >= 1.2.4.1, template-haskell >= 2.14.0.0, integer-roots >= 1.0, integer-logarithms >= 1.0.3.1
+  build-depends:       base >=4.7, arithmoi >=0.4, numeric-prelude >=0.4, reflection >=2.1, constraints >=0.8, random >=1.0, bitvec >= 1.1.1.0, refined >= 0.6.2, text >= 1.2.4.1, template-haskell >= 2.16.0.0, integer-roots >= 1.0, integer-logarithms >= 1.0.3.1
   hs-source-dirs:      src
   default-language:    Haskell2010
-  default-extensions:  TemplateHaskell
