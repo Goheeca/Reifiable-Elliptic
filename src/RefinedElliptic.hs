@@ -10,7 +10,6 @@ import ReifiedElliptic
 import Elliptic
 import UnrefinedElliptic
 import Reificator (using)
-import BinaryPolynomialOperations (polMult)
 
 import Refined
 import Math.NumberTheory.Primes.Testing (isCertifiedPrime)

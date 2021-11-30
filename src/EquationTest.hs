@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
+{-# OPTIONS_GHC -fno-solve-constant-dicts #-}
 
 module EquationTest (
   standardEquationTest,
@@ -12,20 +13,11 @@ import Data.Bit (F2Poly)
 import ReifiedElliptic
 import Reificator (using)
 
-import Debug.Trace (trace)
-import Numeric (showHex)
-import qualified Prelude (toInteger)
-
-debug = flip trace
 
 standardEquationTest :: Integer -> Integer -> Integer -> Integer -> Integer -> Bool
-standardEquationTest modulus a b x y = result `debug` ("m: " ++ show modulus ++ "\na: " ++ show a ++ "\nb: " ++ showHex b "" ++ "\nx: " ++ showHex x "" ++ "\ny: " ++ showHex y "" ++ "\nresult: " ++ show result ++ "\nleft: " ++ show left)
+standardEquationTest modulus a b x y = inField (y ^ 2 - (x ^ 3 + a * x + b)) == inField zero
   where inField = using $ reifiedGaloisPrimeField modulus
-        left = inField (y ^ 2 - (x ^ 3 + a * x + b))
-        result = (left == inField zero)
 
 koblitzEquationTest :: F2Poly -> F2Poly -> F2Poly -> F2Poly -> F2Poly -> Bool
-koblitzEquationTest modulus a b x y = result `debug` ("m: " ++ show modulus ++ "\na: " ++ showHex (Prelude.toInteger a) "" ++ "\nb: " ++ showHex (Prelude.toInteger b) "" ++ "\nx: " ++ showHex (Prelude.toInteger x) "" ++ "\ny: " ++ showHex (Prelude.toInteger y) "" ++ "\nresult: " ++ show result ++ "\nleft: " ++ show left)
+koblitzEquationTest modulus a b x y = inField (y ^ 2 + x * y - (x ^ 3 + a * x ^ 2 + b)) == inField zero
   where inField = using $ reifiedGaloisBinaryField modulus
-        left = inField (y ^ 2 + x * y - (x ^ 3 + a * x ^ 2 + b))
-        result = (left == inField zero)
