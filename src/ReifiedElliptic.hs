@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
+{-# LANGUAGE IncoherentInstances #-}
 
 -- | Making of an underlying finite field for the elliptic curve and the group of the curve itself.
 module ReifiedElliptic (

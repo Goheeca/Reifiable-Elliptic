@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
-{-# OPTIONS_GHC -fno-solve-constant-dicts #-}
+{-# LANGUAGE IncoherentInstances #-}
 
 module EquationTest (
   standardEquationTest,
