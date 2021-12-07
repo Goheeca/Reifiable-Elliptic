@@ -19,6 +19,7 @@ import Data.Typeable (Typeable, typeOf)
 import Data.Text (pack)
 import Data.Bit (F2Poly)
 import EquationTest (standardEquationTest, koblitzEquationTest)
+import IrreducibilityTest (isProbablyIrreducible)
 
 
 hasseTheorem :: Integer -> Integer -> Integer -> Bool
@@ -59,8 +60,8 @@ data KoblitzCurveDefValidator
 
 instance (Typeable a, Integral a) => Predicate KoblitzCurveDefValidator (UnrefinedKoblitzCurveDef a) where
   validate pred def
-    | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf pred) (pack "The degree doesn't agree with the polynomial")
-    -- TODO check modulus_k is a primitive polynomial or at least an irreducible polynomial (Cantor–Zassenhaus algorithm or Berlekamp's algorithm)
+    | integerLog2 (toInteger $ modulus_k def) /= fromIntegral (degree_k def) = Just $ RefineOtherException (typeOf pred) (pack "The degree doesn't agree with the reduction polynomial")
+    | not $ isProbablyIrreducible 256 (degree_k def) (toBinPoly modulus_k def) = Just $ RefineOtherException (typeOf pred) (pack "The reduction polynomial isn't irreducible")
     | 0 >= toInteger (cofactor_k def) = Just $ RefineOtherException (typeOf pred) (pack "Cofactor isn't strictly positive")
     | - (bCoeff_k def + 12 * aCoeff_k def * bCoeff_k def + 48 * aCoeff_k def ^ 2 * bCoeff_k def + 64 * aCoeff_k def ^ 3 * bCoeff_k def + 432 * bCoeff_k def ^ 2) == 0 = Just $ RefineOtherException (typeOf pred) (pack "The curve is singular")
     | not $ hasseTheorem (toInteger $ cofactor_k def) (toInteger $ order_k def) (2 ^ toInteger (degree_k def)) = Just $ RefineOtherException (typeOf pred) (pack "Hasse's theorem not satisfied")
