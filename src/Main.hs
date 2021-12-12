@@ -183,6 +183,30 @@ curveK571 = RefinedKoblitzCurveDef
     4
   )
 
+-- | The Montgomery NIST curve 25519
+curve25519 :: RefinedMontgomeryCurveDef Integer
+curve25519 = RefinedMontgomeryCurveDef
+  $$(refineTH $ UnrefinedMontgomeryCurveDef @Integer
+    (2^255-19)
+    486662
+    1
+    (0x9, 0x5f51e65e475f794b1fe122d388b72eb36dc2b28192839e4dd6163a5d81312c14)
+    7237005577332262213973186563042994240857116359379907606001950938285454250989
+    8
+  )
+
+-- | The Montgomery NIST curve 448
+curve448 :: RefinedMontgomeryCurveDef Integer
+curve448 = RefinedMontgomeryCurveDef
+  $$(refineTH $ UnrefinedMontgomeryCurveDef @Integer
+    (2^448-2^224-1)
+    156326
+    1
+    (0x5, 0x7d235d1295f5b1f66c98ab6e58326fcecbae5d34f55545d060f75dc28df3f6edb8027e2346430d211312c4b150677af76fd7223d457b5b1a)
+    181709681073901722637330951972001133588410340171829515070372549795146003961539585716195755291692375963310293709091662304773755859649779
+    4
+  )
+
 -- | Runs the example with P-521 and K-571
 main :: IO ()
 main = do
@@ -190,3 +214,5 @@ main = do
   useCurve curveP521
   putStrLn "" >> putStrLn "Curve K-571" >> putStrLn ""
   useCurve curveK571
+  putStrLn "" >> putStrLn "Curve 448" >> putStrLn ""
+  useCurve curve448

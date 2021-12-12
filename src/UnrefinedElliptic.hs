@@ -4,6 +4,7 @@
 module UnrefinedElliptic (
   UnrefinedStandardCurveDef(..),
   UnrefinedKoblitzCurveDef(..),
+  UnrefinedMontgomeryCurveDef(..),
 ) where
 
 import Number.NonNegative as NN
@@ -34,6 +35,18 @@ data UnrefinedKoblitzCurveDef a =
     cofactor_k :: NN.Integer
   }
   deriving Lift
+
+data UnrefinedMontgomeryCurveDef a =
+  UnrefinedMontgomeryCurveDef {
+    prime_m :: a,
+    aCoeff_m :: a,
+    bCoeff_m :: a,
+    generator_m :: (a, a),
+    order_m :: NN.Integer,
+    cofactor_m :: NN.Integer
+  }
+  deriving Lift
+
 
 instance Lift NN.Integer where
   liftTyped nnInteger = [|| fromInteger @NN.Integer nnIntegerInteger ||]
