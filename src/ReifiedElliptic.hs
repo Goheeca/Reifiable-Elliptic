@@ -32,8 +32,8 @@ data Weierstrass
 data Montgomery
 data Edwards
 type family EllipticPoint form a
-type instance EllipticPoint Weierstrass a = Maybe (a,a)
-type instance EllipticPoint Montgomery Integer = Rational
+type instance EllipticPoint Weierstrass a = Maybe (a, a)
+type instance EllipticPoint Montgomery a = (a, a)
 type instance EllipticPoint Edwards a = (a, a)
 
 -- | The underlying field maker. GF(p)

@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, FlexibleContexts #-}
 
 module RefinedElliptic (
   RefinedStandardCurveDef(..),
@@ -10,6 +10,7 @@ import ReifiedElliptic
 import Elliptic
 import UnrefinedElliptic
 import Reificator (using)
+import ScalarMultiplication
 
 import Refined
 import Math.NumberTheory.Primes.Testing (isCertifiedPrime)
@@ -82,10 +83,11 @@ instance EllipticCurve RefinedStandardCurveDef Weierstrass Integer where
           y_s = snd . generator_s
   order = order_s . unrefine . unRefinedStandardCurveDef
   cofactor = cofactor_s . unrefine . unRefinedStandardCurveDef
-  inElliptic curve = using ellipticGroup
+  scalarMultiplication curve ellipticPoint scalar = inElliptic $ ellipticPoint +* scalar
     where ellipticGroup = reifiedStandardEllipticGroup
                             (reifiedGaloisPrimeField $ refiner_s prime_s curve)
                             $ refiner_s aCoeff_s curve
+          inElliptic = using ellipticGroup
 
 instance EllipticCurve RefinedKoblitzCurveDef Weierstrass F2Poly where
   generator = \def -> Just (refiner_k x_k def, refiner_k y_k def)
@@ -93,10 +95,11 @@ instance EllipticCurve RefinedKoblitzCurveDef Weierstrass F2Poly where
           y_k = snd . generator_k
   order = order_k . unrefine . unRefinedKoblitzCurveDef
   cofactor = cofactor_k . unrefine . unRefinedKoblitzCurveDef
-  inElliptic curve = using ellipticGroup
+  scalarMultiplication curve ellipticPoint scalar = inElliptic $ ellipticPoint +* scalar
     where ellipticGroup = reifiedKoblitzEllipticGroup
                             (reifiedGaloisBinaryField $ refiner_k modulus_k curve)
                             $ refiner_k aCoeff_k curve
+          inElliptic = using ellipticGroup
 
 
 instance (Show a, Integral a) => Show (RefinedStandardCurveDef a) where

@@ -6,7 +6,6 @@ module DiffieHellman (
 ) where
 
 import Elliptic
-import ScalarMultiplication
 
 import System.Random
 import qualified NumericPrelude.Numeric as N (fromInteger)
@@ -17,7 +16,7 @@ publicKey :: (EllipticCurve a f b, Integral c)
           => a c                 -- ^ a curve definition
           -> NN.Integer          -- ^ a private key
           -> EllipticPoint f b   -- ^ a public key
-publicKey curve secretKey = inElliptic curve $ generator curve +* secretKey
+publicKey curve secretKey = scalarMultiplication curve (generator curve) secretKey
 
 -- | A computation of shared secret
 sharedSecret :: (EllipticCurve a f b, Integral c)
@@ -25,7 +24,7 @@ sharedSecret :: (EllipticCurve a f b, Integral c)
              -> NN.Integer           -- ^ a private key
              -> EllipticPoint f b    -- ^ a public key of the other side
              -> EllipticPoint f b    -- ^ a shared secret
-sharedSecret curve secretKey publicKey = inElliptic curve $ publicKey +* secretKey
+sharedSecret curve secretKey publicKey = scalarMultiplication curve publicKey secretKey
 
 -- | A random generator of private keys in the range suitable for the given curve
 randomSecretKey :: (EllipticCurve a f b, Integral c)
