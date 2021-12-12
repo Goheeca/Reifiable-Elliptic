@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell, TypeApplications #-}
+{-# LANGUAGE TemplateHaskell, TypeApplications, FlexibleContexts #-}
 
 {- | The following simple example incorporates curve defined in <http://crypto-world.info/klima/2002/chip-2002-09-134-136.pdf this article> (czech only).
 
@@ -32,7 +32,7 @@ import RefinedElliptic
 import Refined (refineTH)
 
 -- | Does a Diffie-Hellman exchange with the elliptic curve
-useCurve :: (EllipticCurve a b, Show b, Integral c, Show (a c)) => a c -> IO ()
+useCurve :: (EllipticCurve a f b, Show b, Integral c, Show (a c), Show (EllipticPoint f b)) => a c -> IO ()
 useCurve eC = do
   aliceSecret <- randomSecretKey eC
   bobSecret <- randomSecretKey eC

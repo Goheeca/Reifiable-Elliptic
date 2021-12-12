@@ -76,10 +76,8 @@ type RefinedKoblitzCurveDef' a = Refined KoblitzCurveDefValidator (UnrefinedKobl
 newtype RefinedKoblitzCurveDef a = RefinedKoblitzCurveDef { unRefinedKoblitzCurveDef :: (RefinedKoblitzCurveDef' a)}
 
 
-instance EllipticCurve RefinedStandardCurveDef Integer where
-  aCoeff = refiner_s aCoeff_s
-  bCoeff = refiner_s bCoeff_s
-  generator = \def -> (refiner_s x_s def, refiner_s y_s def)
+instance EllipticCurve RefinedStandardCurveDef Weierstrass Integer where
+  generator = \def -> Just (refiner_s x_s def, refiner_s y_s def)
     where x_s = fst . generator_s
           y_s = snd . generator_s
   order = order_s . unrefine . unRefinedStandardCurveDef
@@ -87,12 +85,10 @@ instance EllipticCurve RefinedStandardCurveDef Integer where
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedStandardEllipticGroup
                             (reifiedGaloisPrimeField $ refiner_s prime_s curve)
-                            $ aCoeff curve
+                            $ refiner_s aCoeff_s curve
 
-instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
-  aCoeff = refiner_k aCoeff_k
-  bCoeff = refiner_k bCoeff_k
-  generator = \def -> (refiner_k x_k def, refiner_k y_k def)
+instance EllipticCurve RefinedKoblitzCurveDef Weierstrass F2Poly where
+  generator = \def -> Just (refiner_k x_k def, refiner_k y_k def)
     where x_k = fst . generator_k
           y_k = snd . generator_k
   order = order_k . unrefine . unRefinedKoblitzCurveDef
@@ -100,13 +96,13 @@ instance EllipticCurve RefinedKoblitzCurveDef F2Poly where
   inElliptic curve = using ellipticGroup
     where ellipticGroup = reifiedKoblitzEllipticGroup
                             (reifiedGaloisBinaryField $ refiner_k modulus_k curve)
-                            $ aCoeff curve
+                            $ refiner_k aCoeff_k curve
 
 
 instance (Show a, Integral a) => Show (RefinedStandardCurveDef a) where
   show eC =
     "Galois Prime Field (p): " ++ show (refiner_s prime_s eC)
-    ++ "\nCurve (a, b): y^2 = x^3 + " ++ show (aCoeff eC) ++ "*x + " ++ show (bCoeff eC)
+    ++ "\nCurve (a, b): y^2 = x^3 + " ++ show (refiner_s aCoeff_s eC) ++ "*x + " ++ show (refiner_s bCoeff_s eC)
     ++ "\nGenerator (G): " ++ show (generator eC)
     ++ "\nOrder (n): " ++ show (order eC)
     ++ "\nCofactor (h): " ++ show (cofactor eC)
@@ -114,7 +110,7 @@ instance (Show a, Integral a) => Show (RefinedStandardCurveDef a) where
 instance (Show a, Integral a) => Show (RefinedKoblitzCurveDef a) where
   show eC =
     "Galois Binary Field (modulus): " ++ show (refiner_k modulus_k eC)
-    ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ show (aCoeff eC) ++ "*x^2 + " ++ show (bCoeff eC)
+    ++ "\nCurve (a, b): y^2 + y*x = x^3 + " ++ show (refiner_k aCoeff_k eC) ++ "*x^2 + " ++ show (refiner_k bCoeff_k eC)
     ++ "\nGenerator (G): " ++ show (generator eC)
     ++ "\nOrder (n): " ++ show (order eC)
     ++ "\nCofactor (h): " ++ show (cofactor eC)

@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude, Rank2Types, FlexibleContexts #-}
 {-# LANGUAGE IncoherentInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 
 -- | Making of an underlying finite field for the elliptic curve and the group of the curve itself.
 module ReifiedElliptic (
@@ -7,7 +8,10 @@ module ReifiedElliptic (
   reifiedGaloisBinaryField,
   reifiedStandardEllipticGroup,
   reifiedKoblitzEllipticGroup,
-  EllipticPoint
+  EllipticPoint,
+  Weierstrass,
+  Montgomery,
+  Edwards,
 ) where
 
 import ReifiedAlgebra
@@ -24,8 +28,13 @@ import qualified Prelude ((+))
 import BinaryPolynomialOperations
 
 
-type EllipticPoint a = Maybe (a,a)
-
+data Weierstrass
+data Montgomery
+data Edwards
+type family EllipticPoint form a
+type instance EllipticPoint Weierstrass a = Maybe (a,a)
+type instance EllipticPoint Montgomery Integer = Rational
+type instance EllipticPoint Edwards a = (a, a)
 
 -- | The underlying field maker. GF(p)
 reifiedGaloisPrimeField :: Integer             -- ^ A prime number, the count of elements in the field
@@ -59,9 +68,9 @@ reifiedGaloisBinaryField modulus =
 
 -- | The maker of a group of the elliptic curve. <https://sefiks.com/2016/03/13/the-math-behind-elliptic-curve-cryptography/ The derivation>.
 reifiedStandardEllipticGroup :: Eq a
-                             => Def Field.C a                        -- ^ An underlying field
-                             -> a                                    -- ^ The linear coefficient in the equation of the particular elliptic curve
-                             -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
+                             => Def Field.C a                                    -- ^ An underlying field
+                             -> a                                                -- ^ The linear coefficient in the equation of the particular elliptic curve
+                             -> Def AbelianGroup.C (EllipticPoint Weierstrass a) -- ^ An elliptic group
 reifiedStandardEllipticGroup field linearCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup
@@ -93,9 +102,9 @@ reifiedStandardEllipticGroup field linearCoeff =
 
 -- | The maker of a group of the elliptic curve. <https://sefiks.com/2016/03/13/the-math-behind-elliptic-curves-over-binary-field/ The derivation>.
 reifiedKoblitzEllipticGroup :: Eq a
-                            => Def Field.C a                        -- ^ An underlying field
-                            -> a                                    -- ^ The quadratic coefficient in the equation of the particular elliptic curve
-                            -> Def AbelianGroup.C (EllipticPoint a) -- ^ An elliptic group
+                            => Def Field.C a                                    -- ^ An underlying field
+                            -> a                                                -- ^ The quadratic coefficient in the equation of the particular elliptic curve
+                            -> Def AbelianGroup.C (EllipticPoint Weierstrass a) -- ^ An elliptic group
 reifiedKoblitzEllipticGroup field quadCoeff =
   -- AbelianGroup: (a * a + Zero, 0, +, -)
   ReifiedAbelianGroup

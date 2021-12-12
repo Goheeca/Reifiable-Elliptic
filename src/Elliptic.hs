@@ -12,15 +12,13 @@ import qualified Algebra.Additive as AbelianGroup
 import qualified Number.NonNegative as NN
 
 
-class EllipticCurve a b | a -> b where
+class EllipticCurve a f b | a -> b, a -> f where
   -- | For computations in an elliptic group
   inElliptic :: Integral c
              => a c
-             -> ((AbelianGroup.C (EllipticPoint b))
-                 => EllipticPoint b)
-             -> EllipticPoint b
-  aCoeff :: Integral c => a c -> b
-  bCoeff :: Integral c => a c -> b
-  generator :: Integral c => a c -> (b, b)
+             -> ((AbelianGroup.C (EllipticPoint f b))
+                 => EllipticPoint f b)
+             -> EllipticPoint f b
+  generator :: Integral c => a c -> EllipticPoint f b
   order :: Integral c => a c -> NN.Integer
   cofactor :: Integral c => a c -> NN.Integer
