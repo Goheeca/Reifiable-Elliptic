@@ -1,5 +1,8 @@
 Author: Goheeca
 
+The build can take a while with all those refined curve definitions
+on my machine it's over 2 min.
+
 Cabal:
 
 Getting started:

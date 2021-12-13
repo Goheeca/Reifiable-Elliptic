@@ -207,7 +207,43 @@ curve448 = RefinedMontgomeryCurveDef
     4
   )
 
--- | Runs the example with P-521 and K-571
+-- | The Edwards NIST curve 25519
+curveEdwards25519 :: RefinedEdwardsCurveDef Integer
+curveEdwards25519 = RefinedEdwardsCurveDef
+  $$(refineTH $ UnrefinedEdwardsCurveDef @Integer
+    (2^255-19)
+    (-1)
+    0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3
+    (0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a, 0x6666666666666666666666666666666666666666666666666666666666666658)
+    7237005577332262213973186563042994240857116359379907606001950938285454250989
+    8
+  )
+
+-- | The Edwards NIST curve 448
+curveEdwards448 :: RefinedEdwardsCurveDef Integer
+curveEdwards448 = RefinedEdwardsCurveDef
+  $$(refineTH $ UnrefinedEdwardsCurveDef @Integer
+    (2^448-2^224-1)
+    1
+    (-39081)
+    (0x4f1970c66bed0ded221d15a622bf36da9e146570470f1767ea6de324a3d3a46412ae1af72ab66511433b80e18b00938e2626a82bc70cc05e, 0x693f46716eb6bc248876203756c9c7624bea73736ca3984087789c1e05a0c2d73ad3ff1ce67c39c4fdbd132c4ed7c8ad9808795bf230fa14)
+    181709681073901722637330951972001133588410340171829515070372549795146003961539585716195755291692375963310293709091662304773755859649779
+    4
+  )
+
+-- | The Edwards NIST curve E448
+curveE448 :: RefinedEdwardsCurveDef Integer
+curveE448 = RefinedEdwardsCurveDef
+  $$(refineTH $ UnrefinedEdwardsCurveDef @Integer
+    (2^448-2^224-1)
+    1
+    0xd78b4bdc7f0daf19f24f38c29373a2ccad46157242a50f37809b1da3412a12e79ccc9c81264cfe9ad080997058fb61c4243cc32dbaa156b9
+    (0x79a70b2b70400553ae7c9df416c792c61128751ac92969240c25a07d728bdc93e21f7787ed6972249de732f38496cd11698713093e9c04fc, 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffff7ffffffffffffffffffffffffffffffffffffffffffffffffffffffe)
+    181709681073901722637330951972001133588410340171829515070372549795146003961539585716195755291692375963310293709091662304773755859649779
+    4
+  )
+
+-- | Runs the example with P-521, K-571, 448, and E448
 main :: IO ()
 main = do
   putStrLn "Curve P-521" >> putStrLn ""
@@ -216,3 +252,5 @@ main = do
   useCurve curveK571
   putStrLn "" >> putStrLn "Curve 448" >> putStrLn ""
   useCurve curve448
+  putStrLn "" >> putStrLn "Curve E448" >> putStrLn ""
+  useCurve curveE448

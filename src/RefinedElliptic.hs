@@ -1,9 +1,11 @@
 {-# LANGUAGE MultiParamTypeClasses, Rank2Types, FlexibleContexts #-}
+{-# LANGUAGE IncoherentInstances, MonoLocalBinds #-}
 
 module RefinedElliptic (
   RefinedStandardCurveDef(..),
   RefinedKoblitzCurveDef(..),
   RefinedMontgomeryCurveDef(..),
+  RefinedEdwardsCurveDef(..),
   F2Poly,
 ) where
 
@@ -20,7 +22,7 @@ import Math.NumberTheory.Logarithms (integerLog2)
 import Data.Typeable (typeRep)
 import Data.Text (pack)
 import Data.Bit (F2Poly)
-import EquationTest (standardEquationTest, koblitzEquationTest, montgomeryEquationTest)
+import EquationTest (standardEquationTest, koblitzEquationTest, montgomeryEquationTest, edwardsEquationTest)
 import IrreducibilityTest (isProbablyIrreducible)
 
 
@@ -35,6 +37,9 @@ refiner_s fval = toIntgr $ fval . unrefine . unRefinedStandardCurveDef
 
 refiner_m :: Integral a => (UnrefinedMontgomeryCurveDef a -> a) -> RefinedMontgomeryCurveDef a -> Integer
 refiner_m fval = toIntgr $ fval . unrefine . unRefinedMontgomeryCurveDef
+
+refiner_e :: Integral a => (UnrefinedEdwardsCurveDef a -> a) -> RefinedEdwardsCurveDef a -> Integer
+refiner_e fval = toIntgr $ fval . unrefine . unRefinedEdwardsCurveDef
 
 toBinPoly :: (Integral a, Integral b) => (c a -> b) -> c a -> F2Poly
 toBinPoly fval def = fromInteger . toInteger $ fval def
@@ -100,6 +105,25 @@ type RefinedMontgomeryCurveDef' a = Refined MontgomeryCurveDefValidator (Unrefin
 newtype RefinedMontgomeryCurveDef a = RefinedMontgomeryCurveDef { unRefinedMontgomeryCurveDef :: (RefinedMontgomeryCurveDef' a)}
 
 
+data EdwardsCurveDefValidator
+
+instance Integral a => Predicate EdwardsCurveDefValidator (UnrefinedEdwardsCurveDef a) where
+  validate pred def
+    | not $ isCertifiedPrime . toInteger $ prime_e def = Just $ RefineOtherException (typeRep pred) (pack "Modulus isn't prime")
+    | 0 >= toInteger (cofactor_e def) = Just $ RefineOtherException (typeRep pred) (pack "Cofactor isn't strictly positive")
+    | toIntgr aCoeff_e def == 0 || toIntgr dCoeff_e def == 0 || toIntgr aCoeff_e def == toIntgr dCoeff_e def = Just $ RefineOtherException (typeRep pred) (pack "The curve is singular")
+    | not $ hasseTheorem (toInteger $ cofactor_e def) (toInteger $ order_e def) (toInteger $ prime_e def) = Just $ RefineOtherException (typeRep pred) (pack "Hasse's theorem not satisfied")
+    -- TODO check number of points exactly via Schoof algorithm or SEA algorithm
+    | not $ edwardsEquationTest (toIntgr prime_e def) (toIntgr aCoeff_e def) (toIntgr dCoeff_e def) x y = Just $ RefineOtherException (typeRep pred) (pack "The generator doesn't lie on the curve")
+    | otherwise = Nothing
+    where x = fromIntegral $ fst . generator_e $ def
+          y = fromIntegral $ snd . generator_e $ def
+
+type RefinedEdwardsCurveDef' a = Refined EdwardsCurveDefValidator (UnrefinedEdwardsCurveDef a)
+-- | A definition of the elliptic curve
+newtype RefinedEdwardsCurveDef a = RefinedEdwardsCurveDef { unRefinedEdwardsCurveDef :: (RefinedEdwardsCurveDef' a)}
+
+
 instance EllipticCurve RefinedStandardCurveDef Weierstrass Integer where
   generator = \def -> Just (refiner_s x_s def, refiner_s y_s def)
     where x_s = fst . generator_s
@@ -125,13 +149,26 @@ instance EllipticCurve RefinedKoblitzCurveDef Weierstrass F2Poly where
           inElliptic = using ellipticGroup
 
 instance EllipticCurve RefinedMontgomeryCurveDef Montgomery Integer where
-  generator = \def -> (refiner_m x_k def, 1)
-    where x_k = fst . generator_m
+  generator = \def -> (refiner_m x_m def, 1)
+    where x_m = fst . generator_m
   order = order_m . unrefine . unRefinedMontgomeryCurveDef
   cofactor = cofactor_m . unrefine . unRefinedMontgomeryCurveDef
   scalarMultiplication curve ellipticPoint scalar = montgomeryLadder inField (refiner_m aCoeff_m curve) ellipticPoint scalar
     where underlyingField = reifiedGaloisPrimeField $ refiner_m prime_m curve
           inField = using underlyingField
+
+instance EllipticCurve RefinedEdwardsCurveDef Edwards Integer where
+  generator = \def -> (refiner_e x_e def, refiner_e y_e def)
+    where x_e = fst . generator_e
+          y_e = snd . generator_e
+  order = order_e . unrefine . unRefinedEdwardsCurveDef
+  cofactor = cofactor_e . unrefine . unRefinedEdwardsCurveDef
+  scalarMultiplication curve ellipticPoint scalar = inElliptic $ ellipticPoint +* scalar
+    where ellipticGroup = reifiedEdwardsEllipticGroup
+                            (reifiedGaloisPrimeField $ refiner_e prime_e curve)
+                            (refiner_e aCoeff_e curve)
+                            (refiner_e dCoeff_e curve)
+          inElliptic = using ellipticGroup
 
 
 instance (Show a, Integral a) => Show (RefinedStandardCurveDef a) where
@@ -153,7 +190,15 @@ instance (Show a, Integral a) => Show (RefinedKoblitzCurveDef a) where
 instance (Show a, Integral a) => Show (RefinedMontgomeryCurveDef a) where
   show eC =
     "Galois Prime Field (p): " ++ show (refiner_m prime_m eC)
-    ++ "\nCurve (a, b): " ++ show (refiner_m bCoeff_m eC) ++ "*v^2 = u*(u^2 + " ++ show (refiner_m aCoeff_m eC) ++ "*u + 1)"
-    ++ "\nProjectino of Generator (G): " ++ show (generator eC)
+    ++ "\nCurve (b, a): " ++ show (refiner_m bCoeff_m eC) ++ "*v^2 = u*(u^2 + " ++ show (refiner_m aCoeff_m eC) ++ "*u + 1)"
+    ++ "\nProjection of Generator (G): " ++ show (generator eC)
+    ++ "\nOrder (n): " ++ show (order eC)
+    ++ "\nCofactor (h): " ++ show (cofactor eC)
+
+instance (Show a, Integral a) => Show (RefinedEdwardsCurveDef a) where
+  show eC =
+    "Galois Prime Field (p): " ++ show (refiner_e prime_e eC)
+    ++ "\nCurve (a, d): " ++ show (refiner_e aCoeff_e eC) ++ "*x^2 + y^2 = 1 + " ++ show (refiner_e dCoeff_e eC) ++ "*x^2*y^2"
+    ++ "\nGenerator (G): " ++ show (generator eC)
     ++ "\nOrder (n): " ++ show (order eC)
     ++ "\nCofactor (h): " ++ show (cofactor eC)

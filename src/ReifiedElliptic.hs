@@ -8,6 +8,7 @@ module ReifiedElliptic (
   reifiedGaloisBinaryField,
   reifiedStandardEllipticGroup,
   reifiedKoblitzEllipticGroup,
+  reifiedEdwardsEllipticGroup,
   EllipticPoint,
   Weierstrass,
   Montgomery,
@@ -131,4 +132,24 @@ reifiedKoblitzEllipticGroup field quadCoeff =
     (\p -> case p of
        Nothing -> Nothing
        Just (x, y) -> Just (x, inField $ negate (x + y)))
+    where inField = using field
+
+
+reifiedEdwardsEllipticGroup :: Eq a
+                            => Def Field.C a                                    -- ^ An underlying field
+                            -> a                                                -- ^ The a coefficient in the equation of the particular elliptic curve
+                            -> a                                                -- ^ The d coefficient in the equation of the particular elliptic curve
+                            -> Def AbelianGroup.C (EllipticPoint Edwards a) -- ^ An elliptic group
+reifiedEdwardsEllipticGroup field aCoeff dCoeff =
+  -- AbelianGroup: (a * a + Zero, 0, +, -)
+  ReifiedAbelianGroup
+    -- the neutral element of addition
+    (inField zero, inField one)
+    -- the add operation
+    (\(x_p, y_p) (x_q, y_q) ->
+       let x_r = inField $ (x_p * y_q + y_p * x_q) / (one + dCoeff * x_p * y_p * x_q * y_q)
+           y_r = inField $ (y_p * y_q - aCoeff * x_p * x_q) / (one - dCoeff * x_p * y_p * x_q * y_q)
+       in (x_r, y_r))
+    -- the additive inverse operation
+    (\(x, y) -> (inField $ negate x, y))
     where inField = using field

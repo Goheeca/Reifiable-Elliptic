@@ -5,6 +5,7 @@ module EquationTest (
   standardEquationTest,
   koblitzEquationTest,
   montgomeryEquationTest,
+  edwardsEquationTest,
 ) where
 
 import NumericPrelude.Numeric
@@ -25,4 +26,8 @@ koblitzEquationTest modulus a b x y = inField (y ^ 2 + x * y - (x ^ 3 + a * x ^ 
 
 montgomeryEquationTest :: Integer -> Integer -> Integer -> Integer -> Integer -> Bool
 montgomeryEquationTest modulus a b u v = inField (b * v ^ 2 - u * (u ^ 2 + a * u + 1)) == inField zero
+  where inField = using $ reifiedGaloisPrimeField modulus
+
+edwardsEquationTest :: Integer -> Integer -> Integer -> Integer -> Integer -> Bool
+edwardsEquationTest modulus a d x y = inField (a * x ^ 2 + y ^ 2 - (1 + d * x ^ 2 * y ^ 2)) == inField zero
   where inField = using $ reifiedGaloisPrimeField modulus
