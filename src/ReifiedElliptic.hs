@@ -24,9 +24,8 @@ import NumericPrelude.Base
 import Math.NumberTheory.Moduli (invertSomeMod, modulo, getVal, SomeMod(..))
 import GHC.Natural (naturalFromInteger)
 
-import Data.Bit (F2Poly)
-import qualified Prelude ((+))
-import BinaryPolynomialOperations
+import Data.Bit (F2Poly, gcdExt)
+import qualified Prelude as P ((+), (*), mod)
 
 
 data Weierstrass
@@ -59,13 +58,15 @@ reifiedGaloisBinaryField :: F2Poly             -- ^ A modulus, a polynomial of d
 reifiedGaloisBinaryField modulus =
   -- Field: (P(d - 1) mod modulus, 0, +, -, *, 1, ^-1)
   ReifiedField
-    0                 -- the neutral element of addition
-    (Prelude.+)       -- the add operation
-    id                -- the additive inverse operation
-    (polMult modulus) -- the multiply operation
-    1                 -- the neutral element of multiplication
-    (polInv modulus)  -- the multiplicative inverse operation
-
+    0                   -- the neutral element of addition
+    (P.+)               -- the add operation
+    id                  -- the additive inverse operation
+    (totalize2 . (P.*)) -- the multiply operation
+    1                   -- the neutral element of multiplication
+    inverse             -- the multiplicative inverse operation
+    where totalize = (`P.mod` modulus)
+          totalize2 = fmap totalize
+          inverse = fmap snd . flip gcdExt $ modulus
 
 -- | The maker of a group of the elliptic curve. <https://sefiks.com/2016/03/13/the-math-behind-elliptic-curve-cryptography/ The derivation>.
 reifiedStandardEllipticGroup :: Eq a
